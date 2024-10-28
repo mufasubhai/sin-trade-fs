@@ -33,7 +33,7 @@ end
 # Unset irrelevant variables.
 deactivate nondestructive
 
-set -gx VIRTUAL_ENV "/Users/adrianapodaca/Repositories/MSC/sin-trade/venv"
+set -gx VIRTUAL_ENV "/Users/adrianapodaca/Repositories/MSC/sin_trade_full_stack/sin-trade-be/venv"
 
 set -gx _OLD_VIRTUAL_PATH $PATH
 set -gx PATH "$VIRTUAL_ENV/bin" $PATH

@@ -1,0 +1,67 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "sin-trade-be",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "flask",
+      "env": {
+        "FLASK_APP": "sin-trade-be/src/beapp.py",
+        "FLASK_ENV": "development"
+      },
+      "args": [
+        "run",
+        "--no-debugger",
+        "--no-reload",
+        "--port=5000"  
+      ],
+      "jinja": true,
+      "justMyCode": true
+    },
+    {
+      "name": "sin-trade-ds",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "flask",
+      "env": {
+        "FLASK_APP": "sin-trade-ds/src/dsapp.py",
+        "FLASK_ENV": "development"
+      },
+      "args": [
+        "run",
+        "--no-debugger",
+        "--no-reload",
+        "--port=5002"  
+      ],
+      "jinja": true,
+      "justMyCode": true
+    },
+  
+    {
+      "name": "sin-trade-fe",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/sin-trade-fe",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "run",
+        "dev" // Replace "start" with your script name if different
+      ],
+      "env": {
+        "BROWSER": "none"
+      },
+      "console": "integratedTerminal"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Run All Services",
+      "configurations": [
+        "sin-trade-be",
+        "sin-trade-ds",
+        "sin-trade-fe"
+      ]
+    }
+  ]
+}
