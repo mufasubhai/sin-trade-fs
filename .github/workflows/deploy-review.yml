@@ -12,10 +12,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
           node-version: '22.1.0'  # Adjust this to your Node.js version
 
@@ -36,25 +36,25 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: '3.12.4'  # Adjust this to your Python version
 
       - name: Install dependencies
         working-directory: ./sin-trade-be
         run: |
-          python -m venv venv
-          source . venv/bin/activate
+          python -m venv sin-trade-be/venv
+          .  sin-trade-be/venv/bin/activate
           pip install -r requirements.txt
           pip install pytest
 
       - name: Run tests
         working-directory: ./sin-trade-be
         run: |
-          source . venv/bin/activate
+          source . sin-trade-be/venv/bin/activate
           pytest
 
   test-ds:
@@ -63,25 +63,25 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: '3.12.4'  # Adjust this to your Python version
 
       - name: Install dependencies
         working-directory: ./sin-trade-ds
         run: |
-          python -m venv venv
-          source . venv/bin/activate
+          python -m venv sin-trade-ds/venv
+          .  sin-trade-ds/venv/bin/activate
           pip install -r requirements.txt
           pip install pytest
 
       - name: Run tests
         working-directory: ./sin-trade-ds
         run: |
-          source . venv/bin/activate
+          source . sin-trade-ds/venv/bin/activate
           pytest
 
   deploy-frontend:
@@ -91,10 +91,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
           node-version: '22.1.0'  # Adjust this to your Node.js version
 
@@ -123,18 +123,18 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: '3.12.4'  # Adjust this to your Python version
 
       - name: Install dependencies
         working-directory: ./sin-trade-be
         run: |
-          python -m venv venv
-          source . venv/bin/activate
+          python -m venv sin-trade-be/venv
+          .  sin-trade-be/venv/bin/activate
           pip install -r requirements.txt
 
       - name: Create Procfile
@@ -156,18 +156,18 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: '3.12.4'  # Adjust this to your Python version
 
       - name: Install dependencies
         working-directory: ./sin-trade-ds
         run: |
-          python -m venv venv
-          source . venv/bin/activate
+          python -m venv sin-trade-be/venv
+          .  sin-trade-ds/venv/bin/activate
           pip install -r requirements.txt
 
       - name: Create Procfile
