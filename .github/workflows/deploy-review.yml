@@ -47,7 +47,7 @@ jobs:
         working-directory: ./sin-trade-be
         run: |
           python -m venv sin-trade-be/venv
-          .  sin-trade-be/venv/bin/activate
+          source sin-trade-be/venv/bin/activate
           pip install -r requirements.txt
           pip install pytest
 
@@ -74,7 +74,7 @@ jobs:
         working-directory: ./sin-trade-ds
         run: |
           python -m venv sin-trade-ds/venv
-          .  sin-trade-ds/venv/bin/activate
+          source sin-trade-ds/venv/bin/activate
           pip install -r requirements.txt
           pip install pytest
 
@@ -134,7 +134,7 @@ jobs:
         working-directory: ./sin-trade-be
         run: |
           python -m venv sin-trade-be/venv
-          .  sin-trade-be/venv/bin/activate
+          source sin-trade-be/venv/bin/activate
           pip install -r requirements.txt
 
       - name: Create Procfile
@@ -167,7 +167,7 @@ jobs:
         working-directory: ./sin-trade-ds
         run: |
           python -m venv sin-trade-be/venv
-          .  sin-trade-ds/venv/bin/activate
+          source sin-trade-ds/venv/bin/activate
           pip install -r requirements.txt
 
       - name: Create Procfile
