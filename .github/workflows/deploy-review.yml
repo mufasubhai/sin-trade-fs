@@ -122,8 +122,9 @@ jobs:
       
       - name: Deploy to Heroku
         run: |
+          working-directory: ./sin-trade-fe
           heroku git:remote -a sin-trade-fe
-          git push heroku `git subtree split --prefix sin-trade-fe main`:refs/heads/main --force
+          git push heroku main
 
   deploy-backend:
     name: Deploy Backend
@@ -160,8 +161,9 @@ jobs:
       
       - name: Deploy to Heroku
         run: |
-          git remote add heroku https://git.heroku.com/sin-trade-be.git
-          git push heroku `git subtree split --prefix sin-trade-be main`:refs/heads/main --force
+          working-directory: ./sin-trade-be
+          heroku git:remote -a sin-trade-be
+          git push heroku main
 
   deploy-ds:
     name: Deploy Data Science Service
@@ -201,5 +203,6 @@ jobs:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         working-directory: ./sin-trade-ds
         run: |
-          git remote add heroku https://git.heroku.com/sin-trade-ds.git
-          git push heroku `git subtree split --prefix sin-trade-ds main`:refs/heads/main --force
+          working-directory: ./sin-trade-ds
+          heroku git:remote -a sin-trade-ds
+          git push heroku main
