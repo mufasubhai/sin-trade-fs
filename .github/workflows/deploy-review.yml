@@ -109,7 +109,7 @@ jobs:
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         run: |
-          git remote add heroku https://git.heroku.com/your-frontend-app.git
+          git remote add heroku https://sin-trade-fe-14d4ac402398.herokuapp.com
           git push heroku `git subtree split --prefix sin-trade-fe main`:refs/heads/main --force
 
   deploy-backend:
@@ -136,7 +136,7 @@ jobs:
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         run: |
-          git remote add heroku https://git.heroku.com/your-backend-app.git
+          git remote add heroku https://sin-trade-be-51f29d2bbbde.herokuapp.com
           git push heroku `git subtree split --prefix sin-trade-be main`:refs/heads/main --force
 
   deploy-ds:
@@ -163,5 +163,5 @@ jobs:
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         run: |
-          git remote add heroku https://git.heroku.com/your-ds-app.git
+          git remote add heroku https://sin-trade-ds-7ca730853eba.herokuapp.com
           git push heroku `git subtree split --prefix sin-trade-ds main`:refs/heads/main --force
