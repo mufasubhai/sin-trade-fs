@@ -139,7 +139,7 @@ jobs:
 
       - name: Create Procfile
         working-directory: ./sin-trade-be
-        run: echo "web: gunicorn src.app:app" > Procfile
+        run: "echo 'web: gunicorn src.beapp:app' > Procfile"
 
       - name: Deploy to Heroku
         env:
@@ -172,7 +172,7 @@ jobs:
 
       - name: Create Procfile
         working-directory: ./sin-trade-ds
-        run: echo "web: gunicorn src.app:app" > Procfile
+        run: echo "web: gunicorn src.dsapp:app" > Procfile
 
       - name: Deploy to Heroku
         env:
