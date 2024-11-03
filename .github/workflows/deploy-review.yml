@@ -48,11 +48,12 @@ jobs:
           python -m venv venv
           source venv/bin/activate
           pip install -r sin-trade-be/requirements.txt
+          pip install pytest
+        working-directory: ./sin-trade-be
 
       - name: Run tests
         run: |
           source venv/bin/activate
-          pip install pytest
           pytest
         working-directory: ./sin-trade-be
 
@@ -74,11 +75,12 @@ jobs:
           python -m venv venv
           source venv/bin/activate
           pip install -r sin-trade-ds/requirements.txt
-
+          pip install pytest
+        working-directory: ./sin-trade-ds
+        
       - name: Run tests
         run: |
           source venv/bin/activate
-          pip install pytest
           pytest
         working-directory: ./sin-trade-ds
 
