@@ -52,6 +52,7 @@ jobs:
       - name: Run tests
         run: |
           source venv/bin/activate
+          pip install pytest
           pytest
         working-directory: ./sin-trade-be
 
@@ -77,6 +78,7 @@ jobs:
       - name: Run tests
         run: |
           source venv/bin/activate
+          pip install pytest
           pytest
         working-directory: ./sin-trade-ds
 
@@ -109,7 +111,7 @@ jobs:
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         run: |
-          git remote add heroku https://sin-trade-fe-14d4ac402398.herokuapp.com
+          git remote add heroku https://git.heroku.com/sin-trade-fe.git
           git push heroku `git subtree split --prefix sin-trade-fe main`:refs/heads/main --force
 
   deploy-backend:
@@ -136,7 +138,7 @@ jobs:
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         run: |
-          git remote add heroku https://sin-trade-be-51f29d2bbbde.herokuapp.com
+          git remote add heroku hhttps://git.heroku.com/sin-trade-be.git
           git push heroku `git subtree split --prefix sin-trade-be main`:refs/heads/main --force
 
   deploy-ds:
@@ -163,5 +165,5 @@ jobs:
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         run: |
-          git remote add heroku https://sin-trade-ds-7ca730853eba.herokuapp.com
+          git remote add heroku https://git.heroku.com/sin-trade-ds.git
           git push heroku `git subtree split --prefix sin-trade-ds main`:refs/heads/main --force
