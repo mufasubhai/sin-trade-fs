@@ -17,7 +17,9 @@
         "--port=5000"  
       ],
       "jinja": true,
-      "justMyCode": true
+      "justMyCode": true,
+      "console": "integratedTerminal"
+
     },
     {
       "name": "sin-trade-ds",
@@ -35,7 +37,8 @@
         "--port=5002"  
       ],
       "jinja": true,
-      "justMyCode": true
+      "justMyCode": true,
+      "console": "integratedTerminal"
     },
   
     {
@@ -52,11 +55,22 @@
         "BROWSER": "none"
       },
       "console": "integratedTerminal"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug Current Javascript Test",
+      "autoAttachChildProcesses": true,
+      "skipFiles": ["<node_internals>/**", "**/node_modules/**"],
+      "program": "${workspaceRoot}/sin-trade-fe/node_modules/vitest/vitest.mjs",
+      "args": ["run", "${relativeFile}"],
+      "smartStep": true,
+      "console": "integratedTerminal"
     }
   ],
   "compounds": [
     {
-      "name": "Run All Services",
+      "name": "Run Full App",
       "configurations": [
         "sin-trade-be",
         "sin-trade-ds",

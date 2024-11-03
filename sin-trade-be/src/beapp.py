@@ -13,4 +13,4 @@ print(__name__)
 
 
 def main():
-    return '{"status":200, "data": "you have made a successful call"}'
+    return '{"status":200, "data": "this has been a success"}'
