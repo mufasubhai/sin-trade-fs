@@ -47,14 +47,14 @@ jobs:
         working-directory: ./sin-trade-be
         run: |
           python -m venv venv
-          source venv/bin/activate
+          source . venv/bin/activate
           pip install -r requirements.txt
           pip install pytest
 
       - name: Run tests
         working-directory: ./sin-trade-be
         run: |
-          source venv/bin/activate
+          source . venv/bin/activate
           pytest
 
   test-ds:
@@ -74,14 +74,14 @@ jobs:
         working-directory: ./sin-trade-ds
         run: |
           python -m venv venv
-          source venv/bin/activate
+          source . venv/bin/activate
           pip install -r requirements.txt
           pip install pytest
 
       - name: Run tests
         working-directory: ./sin-trade-ds
         run: |
-          source venv/bin/activate
+          source . venv/bin/activate
           pytest
 
   deploy-frontend:
@@ -113,7 +113,7 @@ jobs:
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         run: |
-          git remote add heroku https://git.heroku.com/your-frontend-app.git
+          git remote add heroku https://git.heroku.com/sin-trade-fe.git
           git push heroku `git subtree split --prefix sin-trade-fe main`:refs/heads/main --force
 
   deploy-backend:
@@ -134,7 +134,7 @@ jobs:
         working-directory: ./sin-trade-be
         run: |
           python -m venv venv
-          source venv/bin/activate
+          source . venv/bin/activate
           pip install -r requirements.txt
 
       - name: Create Procfile
@@ -146,7 +146,7 @@ jobs:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         working-directory: ./sin-trade-be
         run: |
-          git remote add heroku https://git.heroku.com/your-backend-app.git
+          git remote add heroku https://git.heroku.com/sin-trade-be.git
           git push heroku `git subtree split --prefix sin-trade-be main`:refs/heads/main --force
 
   deploy-ds:
@@ -167,7 +167,7 @@ jobs:
         working-directory: ./sin-trade-ds
         run: |
           python -m venv venv
-          source venv/bin/activate
+          source . venv/bin/activate
           pip install -r requirements.txt
 
       - name: Create Procfile
@@ -179,5 +179,5 @@ jobs:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         working-directory: ./sin-trade-ds
         run: |
-          git remote add heroku https://git.heroku.com/your-ds-app.git
+          git remote add heroku https://git.heroku.com/sin-trade-ds.git
           git push heroku `git subtree split --prefix sin-trade-ds main`:refs/heads/main --force
