@@ -125,9 +125,8 @@ jobs:
 
       - name: Add Heroku remote
         run: |
-          if ! git remote | grep heroku; then
-            heroku git:remote -a sin-trade-fe
-          fi
+          
+          heroku git:remote -a sin-trade-fe
           git remote -v
 
       - name: Deploy to Heroku
@@ -171,9 +170,7 @@ jobs:
 
       - name: Add Heroku remote
         run: |
-          if ! git remote | grep heroku; then
-            heroku git:remote -a sin-trade-be
-          fi
+          heroku git:remote -a sin-trade-be
           git remote -v
 
       - name: Deploy to Heroku
@@ -217,9 +214,7 @@ jobs:
 
       - name: Add Heroku remote
         run: |
-          if ! git remote | grep heroku; then
-            heroku git:remote -a sin-trade-ds
-          fi
+          heroku git:remote -a sin-trade-ds
           git remote -v
 
       - name: Deploy to Heroku
