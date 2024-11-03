@@ -121,8 +121,8 @@ jobs:
         run: heroku auth:token
       
       - name: Deploy to Heroku
+        working-directory: ./sin-trade-fe
         run: |
-          working-directory: ./sin-trade-fe
           heroku git:remote -a sin-trade-fe
           git push heroku main
 
@@ -160,8 +160,8 @@ jobs:
         run: heroku auth:token
       
       - name: Deploy to Heroku
+        working-directory: ./sin-trade-be
         run: |
-          working-directory: ./sin-trade-be
           heroku git:remote -a sin-trade-be
           git push heroku main
 
@@ -203,6 +203,5 @@ jobs:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         working-directory: ./sin-trade-ds
         run: |
-          working-directory: ./sin-trade-ds
           heroku git:remote -a sin-trade-ds
           git push heroku main
