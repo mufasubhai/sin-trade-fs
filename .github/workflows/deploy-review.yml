@@ -12,10 +12,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v2
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v2
         with:
           node-version: '22.1.0'  # Adjust this to your Node.js version
 
@@ -36,25 +36,26 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v2
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v2
         with:
           python-version: '3.12.4'  # Adjust this to your Python version
 
       - name: Install dependencies
+        working-directory: ./sin-trade-be
         run: |
           python -m venv venv
           source venv/bin/activate
-          pip install -r sin-trade-be/requirements.txt
-        working-directory: ./sin-trade-be
+          pip install -r requirements.txt
+          pip install pytest
 
       - name: Run tests
+        working-directory: ./sin-trade-be
         run: |
           source venv/bin/activate
           pytest
-        working-directory: ./sin-trade-be
 
   test-ds:
     name: Test Data Science Service
@@ -70,17 +71,18 @@ jobs:
           python-version: '3.12.4'  # Adjust this to your Python version
 
       - name: Install dependencies
+        working-directory: ./sin-trade-ds
         run: |
           python -m venv venv
           source venv/bin/activate
-          pip install -r sin-trade-ds/requirements.txt
-        working-directory: ./sin-trade-ds
-        
+          pip install -r requirements.txt
+          pip install pytest
+
       - name: Run tests
+        working-directory: ./sin-trade-ds
         run: |
           source venv/bin/activate
           pytest
-        working-directory: ./sin-trade-ds
 
   deploy-frontend:
     name: Deploy Frontend
@@ -111,7 +113,7 @@ jobs:
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         run: |
-          git remote add heroku https://git.heroku.com/sin-trade-fe.git
+          git remote add heroku https://git.heroku.com/your-frontend-app.git
           git push heroku `git subtree split --prefix sin-trade-fe main`:refs/heads/main --force
 
   deploy-backend:
@@ -129,16 +131,22 @@ jobs:
           python-version: '3.12.4'  # Adjust this to your Python version
 
       - name: Install dependencies
+        working-directory: ./sin-trade-be
         run: |
           python -m venv venv
           source venv/bin/activate
-          pip install -r sin-trade-be/requirements.txt
+          pip install -r requirements.txt
+
+      - name: Create Procfile
+        working-directory: ./sin-trade-be
+        run: echo "web: gunicorn src.app:app" > Procfile
 
       - name: Deploy to Heroku
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+        working-directory: ./sin-trade-be
         run: |
-          git remote add heroku hhttps://git.heroku.com/sin-trade-be.git
+          git remote add heroku https://git.heroku.com/your-backend-app.git
           git push heroku `git subtree split --prefix sin-trade-be main`:refs/heads/main --force
 
   deploy-ds:
@@ -156,14 +164,20 @@ jobs:
           python-version: '3.12.4'  # Adjust this to your Python version
 
       - name: Install dependencies
+        working-directory: ./sin-trade-ds
         run: |
           python -m venv venv
           source venv/bin/activate
-          pip install -r sin-trade-ds/requirements.txt
+          pip install -r requirements.txt
+
+      - name: Create Procfile
+        working-directory: ./sin-trade-ds
+        run: echo "web: gunicorn src.app:app" > Procfile
 
       - name: Deploy to Heroku
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+        working-directory: ./sin-trade-ds
         run: |
-          git remote add heroku https://git.heroku.com/sin-trade-ds.git
+          git remote add heroku https://git.heroku.com/your-ds-app.git
           git push heroku `git subtree split --prefix sin-trade-ds main`:refs/heads/main --force
