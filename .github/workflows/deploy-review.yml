@@ -99,7 +99,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22.1.0'  # Adjust this to your Node.js version
+          node-version: '22.1.0'
 
       - name: Install pnpm
         run: npm install -g pnpm
@@ -114,17 +114,22 @@ jobs:
 
       - name: Install Heroku CLI
         run: curl https://cli-assets.heroku.com/install.sh | sh
-      
-      - name: Login to Heroku
+
+      - name: Authenticate with Heroku
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-        run: heroku auth:token
-      
-      - name: Deploy to Heroku
-        working-directory: ./sin-trade-fe
         run: |
-          heroku git:remote -a sin-trade-fe
-          git push heroku main
+          echo "machine git.heroku.com login $HEROKU_API_KEY password $HEROKU_API_KEY" > ~/.netrc
+          chmod 600 ~/.netrc
+
+      - name: Add Heroku remote
+        run: |
+          if ! git remote | grep heroku; then
+            heroku git:remote -a sin-trade-fe
+          fi
+
+      - name: Deploy to Heroku
+        run: git push heroku main --force
 
   deploy-backend:
     name: Deploy Backend
@@ -154,16 +159,21 @@ jobs:
       - name: Install Heroku CLI
         run: curl https://cli-assets.heroku.com/install.sh | sh
       
-      - name: Login to Heroku
+      - name: Authenticate with Heroku
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-        run: heroku auth:token
-      
-      - name: Deploy to Heroku
-        working-directory: ./sin-trade-be
         run: |
-          heroku git:remote -a sin-trade-be
-          git push heroku main
+          echo "machine git.heroku.com login $HEROKU_API_KEY password $HEROKU_API_KEY" > ~/.netrc
+          chmod 600 ~/.netrc
+
+      - name: Add Heroku remote
+        run: |
+          if ! git remote | grep heroku; then
+            heroku git:remote -a sin-trade-be
+          fi
+
+      - name: Deploy to Heroku
+        run: git push heroku main --force
 
   deploy-ds:
     name: Deploy Data Science Service
@@ -193,15 +203,18 @@ jobs:
       - name: Install Heroku CLI
         run: curl https://cli-assets.heroku.com/install.sh | sh
       
-      - name: Login to Heroku
+      - name: Authenticate with Heroku
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-        run: heroku auth:token
-      
-      - name: Deploy to Heroku
-        env:
-          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-        working-directory: ./sin-trade-ds
         run: |
-          heroku git:remote -a sin-trade-ds
-          git push heroku main
+          echo "machine git.heroku.com login $HEROKU_API_KEY password $HEROKU_API_KEY" > ~/.netrc
+          chmod 600 ~/.netrc
+
+      - name: Add Heroku remote
+        run: |
+          if ! git remote | grep heroku; then
+            heroku git:remote -a sin-trade-ds
+          fi
+
+      - name: Deploy to Heroku
+        run: git push heroku main --force
