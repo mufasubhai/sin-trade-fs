@@ -54,7 +54,7 @@ jobs:
       - name: Run tests
         working-directory: ./sin-trade-be
         run: |
-          source . sin-trade-be/venv/bin/activate
+          source sin-trade-be/venv/bin/activate
           pytest
 
   test-ds:
@@ -81,7 +81,7 @@ jobs:
       - name: Run tests
         working-directory: ./sin-trade-ds
         run: |
-          source . sin-trade-ds/venv/bin/activate
+          source sin-trade-ds/venv/bin/activate
           pytest
 
   deploy-frontend:
