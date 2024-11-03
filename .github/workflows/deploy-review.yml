@@ -113,6 +113,7 @@ jobs:
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         run: |
+          echo $HEROKU_API_KEY | heroku auth:token
           git remote add heroku https://git.heroku.com/sin-trade-fe.git
           git push heroku `git subtree split --prefix sin-trade-fe main`:refs/heads/main --force
 
@@ -144,6 +145,7 @@ jobs:
       - name: Deploy to Heroku
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+        run: echo $HEROKU_API_KEY | heroku auth:token
         working-directory: ./sin-trade-be
         run: |
           git remote add heroku https://git.heroku.com/sin-trade-be.git
@@ -177,6 +179,7 @@ jobs:
       - name: Deploy to Heroku
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+        run: echo $HEROKU_API_KEY | heroku auth:token
         working-directory: ./sin-trade-ds
         run: |
           git remote add heroku https://git.heroku.com/sin-trade-ds.git
