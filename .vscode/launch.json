@@ -7,7 +7,7 @@
       "request": "launch",
       "module": "flask",
       "env": {
-        "FLASK_APP": "sin-trade-be/src/beapp.py",
+        "FLASK_APP": "sin-trade-be/src/app.py",
         "FLASK_ENV": "development"
       },
       "args": [
@@ -27,7 +27,7 @@
       "request": "launch",
       "module": "flask",
       "env": {
-        "FLASK_APP": "sin-trade-ds/src/dsapp.py",
+        "FLASK_APP": "sin-trade-ds/src/app.py",
         "FLASK_ENV": "development"
       },
       "args": [
@@ -49,7 +49,7 @@
       "runtimeExecutable": "pnpm",
       "runtimeArgs": [
         "run",
-        "dev" // Replace "start" with your script name if different
+        "start" // Replace "start" with your script name if different
       ],
       "env": {
         "BROWSER": "none"

@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ./sin-trade-fe
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    environment:
+      - NODE_ENV=production
+
+  backend:
+    build:
+      context: ./sin-trade-be
+      dockerfile: Dockerfile
+    ports:
+      - "5002:5002"
+    environment:
+      - FLASK_ENV=production
+      - DATABASE_URL=${DATABASE_URL}  # Example environment variable
+
+  ds:
+    build:
+      context: ./sin-trade-ds
+      dockerfile: Dockerfile
+    ports:
+      - "5004:5004"
+    environment:
+      - FLASK_ENV=production
+      - DATABASE_URL=${DATABASE_URL}  # Example environment variable
