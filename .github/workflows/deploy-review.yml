@@ -14,6 +14,10 @@ jobs:
       docker:
         image: docker:19.03.12
         options: --privileged
+        ports:
+          - 5173:5173
+          - 5002:5002
+          - 5004:5004
 
     steps:
       - name: Checkout code
@@ -31,22 +35,22 @@ jobs:
             ${{ runner.os }}-buildx-
 
       - name: Build frontend Docker image
-        run: docker build -t sin-trade-fe:latest ./sin-trade-fe
+        run: docker build -t sin-trade-fe:latest --build-arg PORT=5173 ./sin-trade-fe
 
       - name: Build backend Docker image
-        run: docker build -t sin-trade-be:latest ./sin-trade-be
+        run: docker build -t sin-trade-be:latest --build-arg PORT=5002 ./sin-trade-be
 
       - name: Build data science Docker image
-        run: docker build -t sin-trade-ds:latest ./sin-trade-ds
+        run: docker build -t sin-trade-ds:latest --build-arg PORT=5004 ./sin-trade-ds
 
       - name: Run frontend container
-        run: docker run -d --name sin-trade-fe -p ${{ env.FE_PORT }}:${{ env.FE_PORT }} sin-trade-fe:latest
+        run: docker run -d --name sin-trade-fe -p 5173:5173 sin-trade-fe:latest
 
       - name: Run backend container
-        run: docker run -d --name sin-trade-be -p ${{ env.BE_PORT }}:${{ env.BE_PORT }} sin-trade-be:latest
+        run: docker run -d --name sin-trade-be -p 5002:5002 sin-trade-be:latest
 
       - name: Run data science container
-        run: docker run -d --name sin-trade-ds -p ${{ env.DS_PORT }}:${{ env.DS_PORT }} sin-trade-ds:latest
+        run: docker run -d --name sin-trade-ds -p 5004:5004 sin-trade-ds:latest
 
       - name: Run frontend tests
         run: docker exec sin-trade-fe pnpm test
