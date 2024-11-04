@@ -15,7 +15,7 @@ jobs:
         image: docker:19.03.12
         options: --privileged
         ports:
-          - 5173:5173
+          - 4173:4173
           - 5002:5002
           - 5004:5004
 
@@ -35,7 +35,7 @@ jobs:
             ${{ runner.os }}-buildx-
 
       - name: Build frontend Docker image
-        run: docker build -t sin-trade-fe:latest --build-arg PORT=5173 ./sin-trade-fe
+        run: docker build -t sin-trade-fe:latest --build-arg PORT=4173 ./sin-trade-fe
 
       - name: Build backend Docker image
         run: docker build -t sin-trade-be:latest --build-arg PORT=5002 ./sin-trade-be
@@ -78,7 +78,7 @@ jobs:
             fi
             sleep 5
           done
-          
+
       - name: Run frontend tests
         run: docker exec sin-trade-fe pnpm test
 

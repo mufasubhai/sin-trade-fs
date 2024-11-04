@@ -20,7 +20,9 @@ COPY . .
 RUN pnpm run build
 
 # Expose the port the app runs on
-EXPOSE $PORT
+EXPOSE ${PORT:-4173}
+
+HEALTHCHECK --interval=5s --timeout=3s --retries=3 CMD curl --fail http://localhost:${PORT:-4173} || exit 1
 
 # Command to run the application
 CMD ["pnpm", "serve"]
