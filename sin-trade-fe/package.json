@@ -6,9 +6,9 @@
   "scripts": {
     "start": "vite",
     "build": "tsc -b && vite build",
-    "build-start": "tsc -b && vite build && vite --host",
+    "build-start": "tsc -b && vite build && vite preview --host",
     "lint": "eslint .",
-    "preview": "vite preview",
+    "serve": "vite preview --host",
     "test": "vitest"
   },
   "dependencies": {

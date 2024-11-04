@@ -6,178 +6,109 @@ on:
       - main
 
 jobs:
-  test-frontend:
-    name: Test Frontend
+  build-and-test:
+    name: Build and Test Services
     runs-on: ubuntu-latest
+
+    services:
+      docker:
+        image: docker:19.03.12
+        options: --privileged
+        ports:
+          - 5173:5173
+          - 5000:5000
+          - 5001:5000
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v2
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Cache Docker layers
+        uses: actions/cache@v2
         with:
-          node-version: '22.1.0'  # Adjust this to your Node.js version
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
 
-      - name: Install pnpm
-        run: npm install -g pnpm
+      - name: Build frontend Docker image
+        run: docker build -t sin-trade-fe:latest ./sin-trade-fe
 
-      - name: Install dependencies
-        run: pnpm install
-        working-directory: ./sin-trade-fe
+      - name: Build backend Docker image
+        run: docker build -t sin-trade-be:latest ./sin-trade-be
 
-      - name: Run tests
-        run: pnpm test
-        working-directory: ./sin-trade-fe
+      - name: Build data science Docker image
+        run: docker build -t sin-trade-ds:latest ./sin-trade-ds
 
-  test-backend:
-    name: Test Backend
+      - name: Run frontend container
+        run: docker run -d --name sin-trade-fe -p 5173:5173 sin-trade-fe:latest
+
+      - name: Run backend container
+        run: docker run -d --name sin-trade-be -p 5000:5000 sin-trade-be:latest
+
+      - name: Run data science container
+        run: docker run -d --name sin-trade-ds -p 5001:5000 sin-trade-ds:latest
+
+      - name: Run frontend tests
+        run: docker exec sin-trade-fe pnpm test
+
+      - name: Run backend tests
+        run: docker exec sin-trade-be pytest
+
+      - name: Run data science tests
+        run: docker exec sin-trade-ds pytest
+
+  deploy:
+    name: Deploy to Heroku
     runs-on: ubuntu-latest
+    needs: build-and-test
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v2
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.12.4'  # Adjust this to your Python version
+      - name: Install Heroku CLI
+        run: curl https://cli-assets.heroku.com/install.sh | sh
 
-      - name: Install dependencies
-        working-directory: ./sin-trade-be
-        run: |
-          python -m venv sin-trade-be/venv
-          source sin-trade-be/venv/bin/activate
-          pip install -r requirements.txt
-          pip install pytest
-
-      - name: Run tests
-        working-directory: ./sin-trade-be
-        run: |
-          source sin-trade-be/venv/bin/activate
-          pytest
-
-  test-ds:
-    name: Test Data Science Service
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.12.4'  # Adjust this to your Python version
-
-      - name: Install dependencies
-        working-directory: ./sin-trade-ds
-        run: |
-          python -m venv sin-trade-ds/venv
-          source sin-trade-ds/venv/bin/activate
-          pip install -r requirements.txt
-          pip install pytest
-
-      - name: Run tests
-        working-directory: ./sin-trade-ds
-        run: |
-          source sin-trade-ds/venv/bin/activate
-          pytest
-
-  deploy-frontend:
-    name: Deploy Frontend
-    runs-on: ubuntu-latest
-    needs: test-frontend
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22.1.0'  # Adjust this to your Node.js version
-
-      - name: Install pnpm
-        run: npm install -g pnpm
-
-      - name: Install dependencies
-        run: pnpm install
-        working-directory: ./sin-trade-fe
-
-      - name: Build frontend
-        run: pnpm run build
-        working-directory: ./sin-trade-fe
-
-      - name: Deploy to Heroku
+      - name: Authenticate with Heroku
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-        run: |
-          git remote add heroku https://git.heroku.com/sin-trade-fe.git
-          git push heroku `git subtree split --prefix sin-trade-fe main`:refs/heads/main --force
+        run: echo $HEROKU_API_KEY | heroku auth:token
 
-  deploy-backend:
-    name: Deploy Backend
-    runs-on: ubuntu-latest
-    needs: test-backend
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.12.4'  # Adjust this to your Python version
-
-      - name: Install dependencies
-        working-directory: ./sin-trade-be
-        run: |
-          python -m venv sin-trade-be/venv
-          source sin-trade-be/venv/bin/activate
-          pip install -r requirements.txt
-
-      - name: Create Procfile
-        working-directory: ./sin-trade-be
-        run: "echo 'web: gunicorn src.app:app' > Procfile"
-
-      - name: Deploy to Heroku
+      - name: Login to Heroku Container Registry
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-        working-directory: ./sin-trade-be
+        run: echo $HEROKU_API_KEY | docker login --username=_ --password-stdin registry.heroku.com
+
+      - name: Build and push frontend Docker image to Heroku
         run: |
-          git remote add heroku https://git.heroku.com/sin-trade-be.git
-          git push heroku `git subtree split --prefix sin-trade-be main`:refs/heads/main --force
+          docker build -t registry.heroku.com/sin-trade-fe/web ./sin-trade-fe
+          docker push registry.heroku.com/sin-trade-fe/web
 
-  deploy-ds:
-    name: Deploy Data Science Service
-    runs-on: ubuntu-latest
-    needs: test-ds
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.12.4'  # Adjust this to your Python version
-
-      - name: Install dependencies
-        working-directory: ./sin-trade-ds
-        run: |
-          python -m venv sin-trade-be/venv
-          source sin-trade-ds/venv/bin/activate
-          pip install -r requirements.txt
-
-      - name: Create Procfile
-        working-directory: ./sin-trade-ds
-        run: "echo 'web: gunicorn src.app:app' > Procfile"
-
-      - name: Deploy to Heroku
+      - name: Release frontend app
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-        working-directory: ./sin-trade-ds
+        run: heroku container:release web --app sin-trade-fe
+
+      - name: Build and push backend Docker image to Heroku
         run: |
-          git remote add heroku https://git.heroku.com/sin-trade-ds.git
-          git push heroku `git subtree split --prefix sin-trade-ds main`:refs/heads/main --force
+          docker build -t registry.heroku.com/sin-trade-be/web ./sin-trade-be
+          docker push registry.heroku.com/sin-trade-be/web
+
+      - name: Release backend app
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+        run: heroku container:release web --app sin-trade-be
+
+      - name: Build and push data science Docker image to Heroku
+        run: |
+          docker build -t registry.heroku.com/sin-trade-ds/web ./sin-trade-ds
+          docker push registry.heroku.com/sin-trade-ds/web
+
+      - name: Release data science app
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+        run: heroku container:release web --app sin-trade-ds
