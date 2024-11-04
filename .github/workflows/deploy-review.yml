@@ -18,10 +18,6 @@ jobs:
           FE_PORT: ${{ env.FE_PORT }}
           BE_PORT: ${{ env.BE_PORT }}
           DS_PORT: ${{ env.DS_PORT }}
-        ports:
-          - $FE_PORT:$FE_PORT
-          - $BE_PORT:$BE_PORT
-          - $DS_PORT:$DS_PORT
 
     steps:
       - name: Checkout code
