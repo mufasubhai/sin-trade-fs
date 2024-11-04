@@ -49,7 +49,7 @@
       "runtimeExecutable": "pnpm",
       "runtimeArgs": [
         "run",
-        "dev" // Replace "start" with your script name if different
+        "start" // Replace "start" with your script name if different
       ],
       "env": {
         "BROWSER": "none"

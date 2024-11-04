@@ -4,7 +4,7 @@ from flask_cors import CORS
 
 app = Flask(__name__)
 # update this to reference environment variable. 
-CORS(app, origins=["http://localhost:5173"])
+CORS(app, origins=["http://localhost:5173", "http://localhost:4173",])
 
 
 print(__name__)
