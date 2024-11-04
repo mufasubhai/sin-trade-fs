@@ -9,7 +9,7 @@
     "build-start": "tsc -b && vite build && vite preview --host",
     "lint": "eslint .",
     "serve": "vite preview --host",
-    "test": "vitest"
+    "test": "vitest run"
   },
   "dependencies": {
     "eslint-plugin-react": "^7.37.1",
