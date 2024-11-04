@@ -20,7 +20,7 @@ COPY . .
 RUN pnpm run build
 
 # Expose the port the app runs on
-EXPOSE $PORT
+EXPOSE 4173
 
 # Command to run the application
 CMD ["pnpm", "serve"]
