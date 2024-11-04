@@ -16,8 +16,8 @@ jobs:
         options: --privileged
         ports:
           - 5173:5173
-          - 5000:5000
-          - 5001:5000
+          - 5002:5002
+          - 5004:5004
 
     steps:
       - name: Checkout code
@@ -47,10 +47,10 @@ jobs:
         run: docker run -d --name sin-trade-fe -p 5173:5173 sin-trade-fe:latest
 
       - name: Run backend container
-        run: docker run -d --name sin-trade-be -p 5000:5000 sin-trade-be:latest
+        run: docker run -d --name sin-trade-be -p 5002:5002 sin-trade-be:latest
 
       - name: Run data science container
-        run: docker run -d --name sin-trade-ds -p 5001:5000 sin-trade-ds:latest
+        run: docker run -d --name sin-trade-ds -p 5004:5004 sin-trade-ds:latest
 
       - name: Run frontend tests
         run: docker exec sin-trade-fe pnpm test

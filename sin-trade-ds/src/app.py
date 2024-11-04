@@ -1,8 +1,11 @@
 
 from flask import Flask, request
+import os
 
 app = Flask(__name__)
 print(__name__)
+port = os.environ.get("PORT", 5002)
+
 
 @app.route("/")
 
