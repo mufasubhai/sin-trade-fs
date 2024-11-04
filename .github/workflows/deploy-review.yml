@@ -45,13 +45,40 @@ jobs:
 
       - name: Run frontend container
         run: docker run -d --name sin-trade-fe -p 5173:5173 sin-trade-fe:latest
-
+      
+      - name: Wait for frontend to be healthy
+        run: |
+          for i in {1..10}; do
+            if [ "$(docker inspect -f '{{.State.Health.Status}}' sin-trade-fe)" == "healthy" ]; then
+              break
+            fi
+            sleep 5
+          done
+      
       - name: Run backend container
         run: docker run -d --name sin-trade-be -p 5002:5002 sin-trade-be:latest
-
+      
+      - name: Wait for backend to be healthy
+        run: |
+          for i in {1..10}; do
+            if [ "$(docker inspect -f '{{.State.Health.Status}}' sin-trade-be)" == "healthy" ]; then
+              break
+            fi
+            sleep 5
+          done
+      
       - name: Run data science container
         run: docker run -d --name sin-trade-ds -p 5004:5004 sin-trade-ds:latest
-
+      
+      - name: Wait for data science to be healthy
+        run: |
+          for i in {1..10}; do
+            if [ "$(docker inspect -f '{{.State.Health.Status}}' sin-trade-ds)" == "healthy" ]; then
+              break
+            fi
+            sleep 5
+          done
+          
       - name: Run frontend tests
         run: docker exec sin-trade-fe pnpm test
 
