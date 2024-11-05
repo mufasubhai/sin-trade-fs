@@ -2,6 +2,11 @@
     "python.testing.pytestArgs": [
         "sin-trade-ds"
     ],
+    
     "python.testing.unittestEnabled": false,
-    "python.testing.pytestEnabled": true
+    "python.testing.pytestEnabled": true,
+    "cSpell.words": [
+        "supabase"
+    ]
+    
 }

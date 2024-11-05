@@ -12,9 +12,9 @@
       },
       "args": [
         "run",
-        "--no-debugger",
-        "--no-reload",
-        "--port=5000"  
+        // "--no-debugger",
+        // "--no-reload",
+        "--port=5002"  
       ],
       "jinja": true,
       "justMyCode": true,
@@ -32,9 +32,9 @@
       },
       "args": [
         "run",
-        "--no-debugger",
-        "--no-reload",
-        "--port=5002"  
+        // "--no-debugger",
+        // "--no-reload",
+        "--port=5004"  
       ],
       "jinja": true,
       "justMyCode": true,
