@@ -4,7 +4,11 @@ test_controller = Blueprint('test_controller', __name__)
 
 @test_controller.route('/', methods=['get'])
 def main():
-    return jsonify('{"status":200, "data": "this has been a success"}'), 200
+    response_data = {
+        "status": 200,
+        "data": "this has been a success"
+    }
+    return jsonify(response_data), 200
 
 
 

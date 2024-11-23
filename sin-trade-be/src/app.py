@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 from flask import Flask, request
 from flask_cors import CORS
-from supabase import create_client, Client
 import logging
-import config 
 from routes.auth_routes import init_auth_routes
 from routes.test_routes import init_test_routes
 
@@ -17,7 +15,6 @@ def create_app():
     logging.info(app.config) 
 
 
- 
     # add routes
     init_auth_routes(app)
     init_test_routes(app)

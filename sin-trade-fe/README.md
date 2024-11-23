@@ -48,3 +48,13 @@ export default tseslint.config({
   },
 })
 ```
+
+
+
+
+## Back End Set Up
+### Testing
+`pipenv run pytest` 
+
+
+## Data Service Set Up

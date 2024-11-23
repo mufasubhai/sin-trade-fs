@@ -15,14 +15,14 @@ class BackendConfig:
     ENVIRONMENT = os.getenv("ENVIRONMENT") or "production"
 
 
-    supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+    supabase: Client 
     
     if ENVIRONMENT == "development": 
         logging.basicConfig(level=logging.INFO)
         
     
     try: 
-        supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+        supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
         logging.info("set up supabase successfully")
     except Exception as e:
         logging.error(f"Failed to connect to database: {e}")

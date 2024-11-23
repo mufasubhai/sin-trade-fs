@@ -16,7 +16,7 @@ jobs:
         options: --privileged
         ports:
           - 5173:5173
-          - 5002:5002
+          - 5002:5002xx
           - 5004:5004
 
     steps:
