@@ -48,3 +48,15 @@ export default tseslint.config({
   },
 })
 ```
+
+poetry 
+Can't control specific Python version used to run Poetry (want to get the latest core Python speedups!)
+Uncertain support and management of poetry plugins (part of "managing the installation")
+Can't run multiple poetry versions side-by-side
+edit
+
+My personal recommendation is to install pipx using homebrew, and then install poetry via pipx (as Poetry themselves now also recommend):
+
+brew install pipx
+pipx ensurepath
+pipx install poetry  # latest version
