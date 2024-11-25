@@ -83,10 +83,10 @@ jobs:
         run: docker exec sin-trade-fe pnpm test
 
       - name: Run backend tests
-        run: docker exec sin-trade-be poetry run pytest
+        run: docker exec sin-trade-be pytest
 
       - name: Run data science tests
-        run: docker exec sin-trade-ds poetry run pytest
+        run: docker exec sin-trade-ds pytest
 
   deploy:
     name: Deploy to Heroku

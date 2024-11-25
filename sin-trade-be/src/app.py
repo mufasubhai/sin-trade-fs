@@ -13,4 +13,4 @@ print(__name__)
 
 
 def main():
-    return '{"status":200, "data": "this has been a success -- and we have updated"}'
+    return '{"status":200, "data": "this has been a success"}'
