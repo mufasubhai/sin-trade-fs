@@ -14,12 +14,12 @@
         "run",
         "--no-debugger",
         "--no-reload",
-        "--port=5000"  
+        "--port=5002"  
       ],
       "jinja": true,
       "justMyCode": true,
-      "console": "integratedTerminal"
-
+      "console": "integratedTerminal",
+      "python": "${workspaceFolder}/sin-trade-be/be-venv/bin/python"
     },
     {
       "name": "sin-trade-ds",
@@ -34,11 +34,12 @@
         "run",
         "--no-debugger",
         "--no-reload",
-        "--port=5002"  
+        "--port=5004"  
       ],
       "jinja": true,
       "justMyCode": true,
-      "console": "integratedTerminal"
+      "console": "integratedTerminal",
+      "python": "${workspaceFolder}/sin-trade-ds/ds-venv/bin/python"
     },
   
     {
