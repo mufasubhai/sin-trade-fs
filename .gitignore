@@ -1,0 +1,34 @@
+# Editor directories and files
+
+
+# Logs
+logs
+sin_trade_fe/*.log
+sin_trade_fe/npm-debug.log*
+sin_trade_fe/yarn-debug.log*
+sin_trade_fe/yarn-error.log*
+sin_trade_fe/pnpm-debug.log*
+sin_trade_fe/lerna-debug.log*
+
+sin_trade_fe/node_modules
+sin_trade_fe/dist
+sin_trade_fe/dist-ssr
+sin_trade_fe/*.local
+
+# Editor directories and files
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+sin_trade_ds/__pycache__/
+sin_trade_be/__pycache__/
+*.pyc
+*be-venv/
+*ds-venv/
+*.env
+*.venv
