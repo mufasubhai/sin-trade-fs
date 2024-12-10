@@ -22,17 +22,19 @@ source sin-trade-be/be-venv/bin/activate
 pip install -r sin-trade-be/requirements.txt
 deactivate
 
-for running tests while you develop
-open a separate terminal for ds and be
-in BE
-source sin-trade-be/be-venv/bin/activate
-cd sin-trade-be
-pytest
+# for running tests while you develop
 
-in DS
-source sin-trade-ds/ds-venv/bin/activate
-cd sin-trade-ds
-pytest
+- open a separate terminal for ds and be
+
+- in BE
+1. source sin-trade-be/be-venv/bin/activate
+2. cd sin-trade-be
+3. pytest
+
+- in DS
+1. source sin-trade-ds/ds-venv/bin/activate
+2. cd sin-trade-ds
+3. pytest
 
 
 
