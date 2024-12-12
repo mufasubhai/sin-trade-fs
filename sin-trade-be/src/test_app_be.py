@@ -1,5 +1,5 @@
 import pytest
-from app import main
+from app_be import main
 
 def test_main():
     string = main()
