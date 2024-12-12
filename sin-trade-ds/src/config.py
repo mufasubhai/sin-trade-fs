@@ -7,7 +7,7 @@ import logging
 load_dotenv()
 
 
-class BackendConfig:
+class DSConfig:
     PORT = os.environ.get("PORT", 5002)
     SUPABASE_URL: str = os.getenv("SUPABASE_URL") 
     SUPABASE_KEY: str = os.getenv("SUPABASE_KEY") 

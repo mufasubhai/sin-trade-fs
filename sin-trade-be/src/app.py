@@ -1,16 +1,26 @@
 #!/usr/bin/env python3
 from flask import Flask, request
 from flask_cors import CORS
-import os
+import logging
+# from routes.auth_routes import init_auth_routes
+from routes.test_routes import init_test_routes
 
-app = Flask(__name__)
-# update this to reference environment variable. 
-CORS(app, origins=["http://localhost:5173", "http://localhost:4173",])
-port = os.environ.get("PORT", 5002)
+# from models.user_model import db
 
-print(__name__)
-@app.route("/")
+def create_app():
+    app = Flask(__name__)
+    app.config.from_object('config.BackendConfig') 
+    CORS(app, origins=app.config["CORS_ORIGINS"].split(','))
+    
+    logging.info(app.config) 
 
-
-def main():
-    return '{"status":200, "data": "this has been a success"}'
+    init_test_routes(app)
+    # add routes
+    # The line `init_auth_routes(app)` is likely a function call that initializes the authentication
+    # routes for the Flask application. This function is expected to be defined elsewhere in the
+    # codebase and is responsible for setting up the routes related to user authentication, such as
+    # login, registration, password reset, etc.
+    # init_auth_routes(app)
+    # init_test_routes(app)
+    
+    return app    # 
