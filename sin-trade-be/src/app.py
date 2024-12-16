@@ -2,7 +2,7 @@
 from flask import Flask, request
 from flask_cors import CORS
 import logging
-# from routes.auth_routes import init_auth_routes
+from routes.auth_routes import init_auth_routes
 from routes.test_routes import init_test_routes
 
 # from models.user_model import db
@@ -20,7 +20,7 @@ def create_app():
     # routes for the Flask application. This function is expected to be defined elsewhere in the
     # codebase and is responsible for setting up the routes related to user authentication, such as
     # login, registration, password reset, etc.
-    # init_auth_routes(app)
+    init_auth_routes(app)
     # init_test_routes(app)
     
     return app    # 

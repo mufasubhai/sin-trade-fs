@@ -23,6 +23,7 @@ class BackendConfig:
     
     try: 
         supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+        breakpoint()
         logging.info("set up supabase successfully")
     except Exception as e:
         logging.error(f"Failed to connect to database: {e}")
