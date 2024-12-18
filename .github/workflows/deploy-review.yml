@@ -85,11 +85,11 @@ jobs:
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-          CORS_ORIGINS: "https://sin-trade-fe.herokuapp.com"
+          CORS_ORIGINS: ${{ secrets.CORS_ORIGINS }}
         run: docker run -d --name sin-trade-be --network sin-trade-network -p 5002:5002 
-          -e SUPABASE_URL 
-          -e SUPABASE_KEY
-          -e CORS_ORIGINS
+          -e SUPABASE_URL="${SUPABASE_URL}"
+          -e SUPABASE_KEY="${SUPABASE_KEY}"
+          -e CORS_ORIGINS="${CORS_ORIGINS}"
           sin-trade-be:latest
       
       - name: Wait for backend to be healthy
@@ -112,11 +112,11 @@ jobs:
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-          CORS_ORIGINS: "https://sin-trade-fe.herokuapp.com"
+          CORS_ORIGINS: ${{ secrets.CORS_ORIGINS }}
         run: docker run -d --name sin-trade-ds --network sin-trade-network -p 5004:5004 
-          -e SUPABASE_URL 
-          -e SUPABASE_KEY
-          -e CORS_ORIGINS
+            -e SUPABASE_URL="${SUPABASE_URL}"
+            -e SUPABASE_KEY="${SUPABASE_KEY}"
+            -e CORS_ORIGINS="${CORS_ORIGINS}"
           sin-trade-ds:latest
       
       - name: Wait for data science to be healthy
