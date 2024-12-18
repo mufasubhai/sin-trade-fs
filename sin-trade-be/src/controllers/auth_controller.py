@@ -10,8 +10,10 @@ def login():
     try:
         data = request.get_json()
         response_data, status_code = AuthService.login(data)
+        
         return response_data, status_code
     except HTTPException as e:
+        
         return jsonify({'error': str(e.description)}), e.code
     except Exception as e:
         return jsonify({'error': str(e)}), 500
