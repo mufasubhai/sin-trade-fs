@@ -20,9 +20,9 @@ COPY . .
 RUN pnpm run build
 
 # Expose the port the app runs on or the default serve port. We may need to adjust this
-EXPOSE ${PORT:-4173}
+EXPOSE ${PORT:-5173}
 
-HEALTHCHECK --interval=5s --timeout=3s --retries=3 CMD curl --fail http://localhost:${PORT:-4173} || exit 1
+HEALTHCHECK --interval=5s --timeout=3s --retries=3 CMD curl --fail http://localhost:${PORT:-5173} || exit 1
 
 # Command to run the application
 CMD ["pnpm", "serve"]
