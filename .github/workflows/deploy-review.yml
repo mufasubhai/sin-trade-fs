@@ -50,8 +50,15 @@ jobs:
         run: |
           for i in {1..10}; do
             if [ "$(docker inspect -f '{{.State.Health.Status}}' sin-trade-fe)" == "healthy" ]; then
+              echo "Frontend container is healthy"
               break
             fi
+            if [ $i -eq 10 ]; then
+              echo "Frontend container failed to become healthy"
+              docker logs sin-trade-fe
+              exit 1
+            fi
+            echo "Waiting for frontend container... attempt $i"
             sleep 5
           done
       
@@ -62,8 +69,15 @@ jobs:
         run: |
           for i in {1..10}; do
             if [ "$(docker inspect -f '{{.State.Health.Status}}' sin-trade-be)" == "healthy" ]; then
+              echo "Frontend container is healthy"
               break
             fi
+            if [ $i -eq 10 ]; then
+              echo "Frontend container failed to become healthy"
+              docker logs sin-trade-fe
+              exit 1
+            fi
+            echo "Waiting for frontend container... attempt $i"
             sleep 5
           done
       
@@ -74,8 +88,15 @@ jobs:
         run: |
           for i in {1..10}; do
             if [ "$(docker inspect -f '{{.State.Health.Status}}' sin-trade-ds)" == "healthy" ]; then
+              echo "Frontend container is healthy"
               break
             fi
+            if [ $i -eq 10 ]; then
+              echo "Frontend container failed to become healthy"
+              docker logs sin-trade-fe
+              exit 1
+            fi
+            echo "Waiting for frontend container... attempt $i"
             sleep 5
           done
 
