@@ -10,6 +10,10 @@ def main():
     }
     return jsonify(response_data), 200
 
+@test_controller.route('/health', methods=['get'])
+def health_check():
+    return jsonify({"status": "healthy"}), 200
+
 
 def init_test_routes(app):
     app.register_blueprint(test_controller)

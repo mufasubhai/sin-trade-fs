@@ -1,8 +1,12 @@
 # Use the official Python image from the Docker Hub
 FROM python:3.12.4-slim
 
+RUN apt-get update && \
+    apt-get install -y curl && \
+    rm -rf /var/lib/apt/lists/*
 # Set the working directory
 WORKDIR /app
+
 
 # Copy the requirements file into the container
 COPY requirements.txt .
