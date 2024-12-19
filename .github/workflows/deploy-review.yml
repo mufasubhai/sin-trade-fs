@@ -82,7 +82,7 @@ jobs:
               docker logs sin-trade-be
               exit 1
             fi
-            echo "Waiting for frontend container... attempt $i"
+            echo "Waiting for backend container... attempt $i"
             sleep 10
           done
 
@@ -106,7 +106,7 @@ jobs:
               docker logs sin-trade-ds
               exit 1
             fi
-            echo "Waiting for frontend container... attempt $i"
+            echo "Waiting for data service container... attempt $i"
             sleep 10
           done
 

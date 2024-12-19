@@ -13,7 +13,10 @@ def create_app():
     CORS(app, origins=app.config["CORS_ORIGINS"].split(','))
     
     logging.info(app.config) 
-
+    
+    @app.route('/health')
+    def health_check():
+        return jsonify({"status": "healthy"}), 200
 
     # add routes
     # init_auth_routes(app)
