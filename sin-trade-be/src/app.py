@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 import logging
 from src.routes.auth_routes import init_auth_routes
