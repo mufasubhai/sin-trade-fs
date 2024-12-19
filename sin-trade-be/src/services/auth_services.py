@@ -1,7 +1,7 @@
 # services/auth_services.py
-from models.auth_model import AuthResponse
-from models.user_model import User
-from config import BackendConfig
+from src.models.auth_model import AuthResponse
+from src.models.user_model import User
+from src.config import BackendConfig
 from flask import jsonify
 
 

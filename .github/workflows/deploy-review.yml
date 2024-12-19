@@ -1,6 +1,6 @@
 name: deploy-review
 
-on: 
+on:
   push:
     branches:
       - main
@@ -26,9 +26,6 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
 
-      - name: Create Docker network
-        run: docker network create sin-trade-network
-
       - name: Cache Docker layers
         uses: actions/cache@v2
         with:
@@ -36,22 +33,6 @@ jobs:
           key: ${{ runner.os }}-buildx-${{ github.sha }}
           restore-keys: |
             ${{ runner.os }}-buildx-
-
-      - name: Cache pnpm modules
-        uses: actions/cache@v2
-        with:
-          path: ~/.pnpm-store
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-
-
-      - name: Cache pip packages
-        uses: actions/cache@v2
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
 
       - name: Build frontend Docker image
         run: docker build -t sin-trade-fe:latest --build-arg PORT=5173 ./sin-trade-fe
@@ -63,8 +44,8 @@ jobs:
         run: docker build -t sin-trade-ds:latest --build-arg PORT=5004 ./sin-trade-ds
 
       - name: Run frontend container
-        run: docker run -d --name sin-trade-fe --network sin-trade-network -p 5173:5173 sin-trade-fe:latest
-      
+        run: docker run -d --name sin-trade-fe -p 5173:5173 sin-trade-fe:latest
+
       - name: Wait for frontend to be healthy
         run: |
           for i in {1..10}; do
@@ -80,84 +61,63 @@ jobs:
             echo "Waiting for frontend container... attempt $i"
             sleep 5
           done
-      
+
       - name: Run backend container
-        env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-          CORS_ORIGINS: ${{ secrets.CORS_ORIGINS }}
-        run: docker run -d --name sin-trade-be --network sin-trade-network -p 5002:5002 
-          -e SUPABASE_URL="${SUPABASE_URL}"
-          -e SUPABASE_KEY="${SUPABASE_KEY}"
-          -e CORS_ORIGINS="${CORS_ORIGINS}"
+        run: docker run -d --name sin-trade-be -p 5002:5002
+          -e FLASK_ENV=production
+          -e PORT=5002
+          -e SUPABASE_URL=${{ secrets.SUPABASE_URL }}
+          -e SUPABASE_KEY=${{ secrets.SUPABASE_KEY }}
           sin-trade-be:latest
-      
+
       - name: Wait for backend to be healthy
         run: |
           for i in {1..15}; do
             if [ "$(docker inspect -f '{{.State.Health.Status}}' sin-trade-be)" == "healthy" ]; then
-              echo "Backend container is healthy"
+              echo "Frontend container is healthy"
               break
             fi
             if [ $i -eq 15 ]; then
-              echo "Backend container failed to become healthy"
+              echo "BE container failed to become healthy"
               docker logs sin-trade-be
               exit 1
             fi
-            echo "Waiting for backend container... attempt $i"
+            echo "Waiting for frontend container... attempt $i"
             sleep 10
           done
-      
+
       - name: Run data science container
-        env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-          CORS_ORIGINS: ${{ secrets.CORS_ORIGINS }}
-        run: docker run -d --name sin-trade-ds --network sin-trade-network -p 5004:5004 
-            -e SUPABASE_URL="${SUPABASE_URL}"
-            -e SUPABASE_KEY="${SUPABASE_KEY}"
-            -e CORS_ORIGINS="${CORS_ORIGINS}"
+        run: docker run -d --name sin-trade-ds -p 5004:5004
+          -e FLASK_ENV=production 
+          -e PORT=5004
+          -e SUPABASE_URL=${{ secrets.SUPABASE_URL }}
+          -e SUPABASE_KEY=${{ secrets.SUPABASE_KEY }}
           sin-trade-ds:latest
-      
+
       - name: Wait for data science to be healthy
         run: |
           for i in {1..15}; do
             if [ "$(docker inspect -f '{{.State.Health.Status}}' sin-trade-ds)" == "healthy" ]; then
-              echo "Data Science container is healthy"
+              echo "Frontend container is healthy"
               break
             fi
-            if [ $i -eq 15 ]; then
-              echo "Data Science container failed to become healthy"
+            if [ $i -eq 15]; then
+              echo "DS container failed to become healthy"
               docker logs sin-trade-ds
               exit 1
             fi
-            echo "Waiting for data science container... attempt $i"
+            echo "Waiting for frontend container... attempt $i"
             sleep 10
           done
 
       - name: Run frontend tests
-        run: |
-          if ! docker exec sin-trade-fe pnpm test; then
-            echo "Frontend tests failed"
-            docker logs sin-trade-fe
-            exit 1
-          fi
+        run: docker exec sin-trade-fe pnpm test
 
       - name: Run backend tests
-        run: |
-          if ! docker exec sin-trade-be pytest; then
-            echo "Backend tests failed"
-            docker logs sin-trade-be
-            exit 1
-          fi
+        run: docker exec sin-trade-be pytest
 
       - name: Run data science tests
-        run: |
-          if ! docker exec sin-trade-ds pytest; then
-            echo "Data Science tests failed"
-            docker logs sin-trade-ds
-            exit 1
-          fi
+        run: docker exec sin-trade-ds pytest
 
   deploy:
     name: Deploy to Heroku
@@ -180,17 +140,6 @@ jobs:
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         run: echo $HEROKU_API_KEY | docker login --username=_ --password-stdin registry.heroku.com
-
-      - name: Set Heroku config vars
-        env:
-          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-        run: |
-          heroku config:set SUPABASE_URL=${{ secrets.SUPABASE_URL }} --app sin-trade-be
-          heroku config:set SUPABASE_KEY=${{ secrets.SUPABASE_KEY }} --app sin-trade-be
-          heroku config:set CORS_ORIGINS="https://sin-trade-fe.herokuapp.com" --app sin-trade-be
-          heroku config:set SUPABASE_URL=${{ secrets.SUPABASE_URL }} --app sin-trade-ds
-          heroku config:set SUPABASE_KEY=${{ secrets.SUPABASE_KEY }} --app sin-trade-ds
-          heroku config:set CORS_ORIGINS="https://sin-trade-fe.herokuapp.com" --app sin-trade-ds
 
       - name: Build and push frontend Docker image to Heroku
         run: |
@@ -221,9 +170,3 @@ jobs:
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         run: heroku container:release web --app sin-trade-ds
-
-      - name: Cleanup
-        if: always()
-        run: |
-          docker-compose down || true
-          docker network rm sin-trade-network || true

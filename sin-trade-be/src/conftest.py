@@ -1,7 +1,11 @@
 ## all of our tests have access to this config. We can pass a client as a argument to our tests to expose
 import pytest
+import os
+import sys
 # import logging
-from app import create_app
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from src.app import create_app  # No
 
 @pytest.fixture(scope='session')
 def app():

@@ -1,6 +1,6 @@
 # controllers/auth_controller.py
 from flask import Blueprint, request, jsonify
-from services.auth_services import AuthService
+from src.services.auth_services import AuthService
 from werkzeug.exceptions import HTTPException
 
 auth_controller = Blueprint('auth_controller', __name__)

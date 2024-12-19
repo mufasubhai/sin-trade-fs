@@ -7,7 +7,9 @@
       "request": "launch",
       "module": "flask",
       "env": {
-        "FLASK_APP": "sin-trade-be/src/app.py",
+        "FLASK_APP": "src.app:app",
+        "FLASK_DEBUG": "1",
+        "PYTHONPATH": "${workspaceFolder}/sin-trade-be",
         "FLASK_ENV": "development"
       },
       "args": [
@@ -27,7 +29,9 @@
       "request": "launch",
       "module": "flask",
       "env": {
-        "FLASK_APP": "sin-trade-ds/src/app.py",
+        "FLASK_APP": "src.app:app",
+        "FLASK_DEBUG": "1",
+        "PYTHONPATH": "${workspaceFolder}/sin-trade-ds",
         "FLASK_ENV": "development"
       },
       "args": [

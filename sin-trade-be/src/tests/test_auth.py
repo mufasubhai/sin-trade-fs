@@ -1,8 +1,8 @@
 import pytest
 from app import create_app
 from models.user_model import User
-from utils.number_utils import generate_random_number
-from utils.string_utils import generate_random_string
+from src.utils.number_utils import generate_random_number
+from src.utils.string_utils import generate_random_string
 
     
 

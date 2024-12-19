@@ -1,6 +1,6 @@
 
 from datetime import datetime
-from utils.date_utils import parse_datetime
+from src.utils.date_utils import parse_datetime
 
 class User:
     def __init__(self, user_data):

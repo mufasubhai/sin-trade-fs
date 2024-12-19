@@ -2,14 +2,14 @@
 from flask import Flask, request
 from flask_cors import CORS
 import logging
-from routes.auth_routes import init_auth_routes
-from routes.test_routes import init_test_routes
+from src.routes.auth_routes import init_auth_routes
+from src.routes.test_routes import init_test_routes
 
 # from models.user_model import db
 
 def create_app():
     app = Flask(__name__)
-    app.config.from_object('config.BackendConfig') 
+    app.config.from_object('src.config.BackendConfig') 
     CORS(app, origins=app.config["CORS_ORIGINS"].split(','))
     
     logging.info(app.config) 
@@ -24,3 +24,8 @@ def create_app():
     # init_test_routes(app)
     
     return app    # 
+
+app = create_app()
+
+if __name__ == '__main__':
+    app.run()
