@@ -9,9 +9,9 @@ load_dotenv()
 
 class DSConfig:
     PORT = os.environ.get("PORT", 5002)
-    SUPABASE_URL: str = os.getenv("SUPABASE_URL") 
-    SUPABASE_KEY: str = os.getenv("SUPABASE_KEY") 
-    CORS_ORIGINS = os.getenv("CORS_ORIGINS")
+    SUPABASE_URL: str = os.getenv("SUPABASE_URL") or ""
+    SUPABASE_KEY: str = os.getenv("SUPABASE_KEY") or ""
+    CORS_ORIGINS = os.getenv("CORS_ORIGINS") or "http://localhost:5173"
     ENVIRONMENT = os.getenv("ENVIRONMENT") or "production"
 
 
