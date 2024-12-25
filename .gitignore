@@ -32,3 +32,5 @@ sin_trade_be/__pycache__/
 *ds-venv/
 *.env
 *.venv
+
+.chrome-debug-profile/

@@ -16,13 +16,19 @@ export default ({ mode }: { mode: string }): UserConfig => {
 
 
   return defineConfig({
-
     plugins: [react()],
+    build: {
+      sourcemap: true,
+      minify: false, // During debugging, this can help
+    },
     server: {
-      port: Number(process.env.PORT) || 5173, // Ensure the port is a number
+      port: Number(process.env.PORT) || 5173,
     },
-    preview: {
-      port: Number(process.env.PORT) || 5173, // Ensure the port is a number for preview mode
+    css: {
+      devSourcemap: true
     },
+    optimizeDeps: {
+      include: ['react', 'react-dom']
+    }
   });
 };

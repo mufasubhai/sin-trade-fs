@@ -1,16 +1,12 @@
 import { useState } from "react";
 import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
-// import "./App.css";
+import { DataResponse, dataUrl } from "./api/AuthConfig";
 
-interface DataResponse {
-  status: string;
-  data: string;
-}
 
 function App() {
   const [count, setCount] = useState(0);
-  const dataUrl: string = import.meta.env.VITE_BACKEND_URL as string;
+  // const dataUrl: string = import.meta.env.VITE_BACKEND_URL as string;
 
   const fetchFromDataUrl = async () => {
     try {
