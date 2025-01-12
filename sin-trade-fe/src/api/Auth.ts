@@ -1,15 +1,25 @@
-import { dataUrl, DataResponse } from "./AuthConfig";
+import { UserResponse } from "../interfaces/UserInterface";
+import { dataUrl } from "./AuthConfig";
 
+export const login = async ({
+  email,
+  password,
+  setIsLoading,
+  loginUser,
+  logoutUser,
+  setIsError,
+  setIsSuccess
+}: {
+  email: string;
+  password: string;
+  setIsLoading: (isLoading: boolean) => void;
+  loginUser: (userData: UserResponse) => void;
+  logoutUser: () => void;
+  setIsError: (isError: boolean) => void;
+  setIsSuccess: (isSuccess: boolean) => void;
+}) => {
 
-
-
-
-export const login = async (
-  email: string,
-  password: string,
-  setIsLoading: (isLoading: boolean) => void,
-  setIsError: (isError: boolean) => void
-) => {
+  console.log(setIsSuccess, setIsError, setIsLoading, loginUser, logoutUser, email, password);  
   setIsLoading(true);
   try {
     const response = await fetch(`${dataUrl}auth/login`, {
@@ -19,30 +29,34 @@ export const login = async (
       method: "POST",
       body: JSON.stringify({ email, password }),
     });
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+
+    console.log(response);
+    if (!response.ok || response.status !== 200) {
       setIsError(true);
-      setIsLoading(false);
+      setIsSuccess(false);
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
-    const data = (await response.json()) as DataResponse;
-    setIsLoading(false);
+
+    // here we need to redirect to the dashboard page,
+    // we also need to store the token and user data in local storage
+    // we also need to store the token and user data in state
+    // we also need to redirect to the dashboard page
+    const data = (await response.json()) as UserResponse;
     setIsError(false);
+    setIsSuccess(true);
+    loginUser(data);
 
+    console.log(data);
     
-
-    // TODO: store token in local storage
-    // TODO: store user data in local storage
-    // TODO: store token in state
-    // TODO: store user data in state
-
+    return "success";
     
     // TODO: redirect to dashboard page
-    console.log(data);
-    return data;
   } catch (error) {
     console.error("Error logging in", error);
     setIsLoading(false);
+    logoutUser();
     setIsError(true);
+    setIsSuccess(false);
     throw new Error("Failed to log in");
   }
-};
+  };
