@@ -1,6 +1,8 @@
 // /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 // /* eslint-disable @typescript-eslint/no-unsafe-call */
 // /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+
+/// <reference types="vitest" />
 import { defineConfig, loadEnv, UserConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 
@@ -34,5 +36,8 @@ export default ({ mode }: { mode: string }): UserConfig => {
     optimizeDeps: {
       include: ["react", "react-dom"],
     },
+    test: {
+      environment: 'jsdom'
+    }
   });
 };
