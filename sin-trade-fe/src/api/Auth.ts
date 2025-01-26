@@ -19,7 +19,6 @@ export const login = async ({
   setIsSuccess: (isSuccess: boolean) => void;
 }) => {
 
-  console.log(setIsSuccess, setIsError, setIsLoading, loginUser, logoutUser, email, password);  
   setIsLoading(true);
   try {
     const response = await fetch(`${dataUrl}auth/login`, {
@@ -53,10 +52,9 @@ export const login = async ({
     // TODO: redirect to dashboard page
   } catch (error) {
     console.error("Error logging in", error);
-    setIsLoading(false);
     logoutUser();
+    setIsLoading(false);
     setIsError(true);
     setIsSuccess(false);
-    throw new Error("Failed to log in");
   }
   };

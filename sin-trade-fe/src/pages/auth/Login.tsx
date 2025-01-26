@@ -3,24 +3,25 @@ import Input from "../../components/Input";
 import Button from "../../components/AsyncButton";
 import { login } from "../../api/Auth";
 import { useAuth } from "../../context/useAuth";
-import { useNavigate } from "react-router";
+import { useUI } from "../../context/useUI";
+
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [isError, setIsError] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
+  // const [isLoading, setIsLoading] = useState(false);
+  // const [isError, setIsError] = useState(false);
+  // const [isSuccess, setIsSuccess] = useState(false);
   // here we're pulling
   const { loginUser, logoutUser } = useAuth();
-  const navigate = useNavigate();
-
+  // const navigate = useNavigate();
+  const { isLoading, isError, isSuccess, setIsLoading, setIsError, setIsSuccess, navigate} = useUI();
 
 
 
   const handleLogin = () => {
-    console.log("handleLogin");
-    console.log(email, password, setIsLoading, loginUser, logoutUser, setIsError, setIsSuccess);
+    // console.log("handleLogin");
+    // console.log(email, password, setIsLoading, loginUser, logoutUser, setIsError, setIsSuccess);
     void login({
       email: email,
       password: password,
@@ -57,7 +58,7 @@ export default function Login() {
           placeholder={password}
           type="password"
           name="password"
-          id="email"
+          id="password"
           onChange={(e) => {
             setPassword(e.target.value);
           }}
@@ -69,7 +70,12 @@ export default function Login() {
           isLoading={isLoading}
           isError={isError}
         />
+        
+       {/* want to change this to a reusable text type component */}
+        {isError ? <div>Invalid credentials. Please try again.</div>
+        : <></>}
+
+        </div>
       </div>
-    </div>
   );
 }

@@ -37,6 +37,7 @@ export default ({ mode }: { mode: string }): UserConfig => {
       include: ["react", "react-dom"],
     },
     test: {
+      include: ['src/**/*.test.tsx', 'src/**/*.spec.tsx'],
       environment: 'jsdom'
     }
   });

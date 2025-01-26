@@ -1,7 +1,6 @@
 import React, { createContext, useState } from "react";
 import { User, UserResponse } from "../interfaces/UserInterface";
 
-
 interface AuthContextType {
   accessToken: string | null;
   refreshToken: string | null;
