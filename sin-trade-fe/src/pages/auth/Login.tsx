@@ -63,11 +63,20 @@ export default function Login() {
             setPassword(e.target.value);
           }}
         />
+
+
         <Button
           text="Login"
           onClick={handleLogin}
           disabled={false}
           isLoading={isLoading}
+          isError={isError}
+        />
+        <Button
+          text="Register"
+          onClick={() => void navigate('/register')}
+          disabled={false}
+          isLoading={false}
           isError={isError}
         />
         

@@ -7,18 +7,19 @@ import Login from "./pages/auth/Login.tsx";
 import App from "./App.tsx";
 import "./index.css";
 import { ProtectedRoute } from "./components/ProtectedRoute.tsx";
+import { UnprotectedRoute } from "./components/UnprotectedRoute.tsx";
 import Dashboard from "./pages/auth/Dashboard.tsx";
 import { UIProvider } from "./context/UIContext.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <AuthProvider>
-        <BrowserRouter>
-      <UIProvider>
+      <BrowserRouter>
+        <UIProvider>
           <Routes>
-            <Route path="/" element={<App />} />
-            <Route path="login" element={<Login />} />
-            <Route path="register" element={<Register />} />
+            <Route path="/" element={<UnprotectedRoute><App /></UnprotectedRoute>} />
+            <Route path="login" element={<UnprotectedRoute><Login /></UnprotectedRoute>} />
+            <Route path="register" element={<UnprotectedRoute><Register /></UnprotectedRoute>} />
 
             <Route
               path="/dashboard"
@@ -29,8 +30,8 @@ createRoot(document.getElementById("root")!).render(
               }
             />
           </Routes>
-      </UIProvider>
-        </BrowserRouter>
+        </UIProvider>
+      </BrowserRouter>
     </AuthProvider>
   </StrictMode>
 );

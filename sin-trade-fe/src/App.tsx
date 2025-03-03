@@ -1,58 +1,22 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
-import { DataResponse, dataUrl } from "./api/AuthConfig";
-
+import { useEffect } from "react";
+import { useAuth } from "./context/useAuth";
+import { useNavigate } from "react-router";
 
 function App() {
-  const [count, setCount] = useState(0);
-  // const dataUrl: string = import.meta.env.VITE_BACKEND_URL as string;
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
 
-  const fetchFromDataUrl = async () => {
-    try {
-      const response = await fetch(dataUrl);
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data: DataResponse = await response.json() as DataResponse;
-
-      console.log(data);
-    } catch (error) {
-      console.error("error fetching data", error);
+  useEffect(() => {
+    if (isAuthenticated) {
+      void navigate("/dashboard");
+    } else {
+      void navigate("/login");
     }
-  };
-
-  return (
-    <>
-      <div className="flex flex-row">
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1 className="bg-teal-700">Vite + React</h1>
-      <div className="card">
-        <button
-          onClick={() => {
-            setCount((count) => count + 1);
-            fetchFromDataUrl().catch((error) => console.log(error));
-          }}
-        >
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  );
+  }, [isAuthenticated, navigate]);
+  // here we just have a self closing placeholder div.
+  // we don't actually ever want to render this page for the time being,
+  // this may change in the future.
+  return <div className="flex flex-row" />;
 }
 
 export default App;
