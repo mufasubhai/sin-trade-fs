@@ -1,4 +1,4 @@
-import { UserResponse } from "../interfaces/UserInterface";
+import { convertDataToUserObject, User } from "../interfaces/UserInterface";
 import { dataUrl } from "./AuthConfig";
 
 export const login = async ({
@@ -8,17 +8,16 @@ export const login = async ({
   loginUser,
   logoutUser,
   setIsError,
-  setIsSuccess
+  setIsSuccess,
 }: {
   email: string;
   password: string;
   setIsLoading: (isLoading: boolean) => void;
-  loginUser: (userData: UserResponse) => void;
+  loginUser: (userData: User) => void;
   logoutUser: () => void;
   setIsError: (isError: boolean) => void;
   setIsSuccess: (isSuccess: boolean) => void;
 }) => {
-
   setIsLoading(true);
   try {
     const response = await fetch(`${dataUrl}auth/login`, {
@@ -40,15 +39,18 @@ export const login = async ({
     // we also need to store the token and user data in local storage
     // we also need to store the token and user data in state
     // we also need to redirect to the dashboard page
-    const data = (await response.json()) as UserResponse;
+
+    const data = (await response.json()) as User;
+
+    // need to use zod here to validate the data
+    
+
     setIsError(false);
     setIsSuccess(true);
-    loginUser(data);
+    loginUser(user);
 
-    console.log(data);
-    
     return "success";
-    
+
     // TODO: redirect to dashboard page
   } catch (error) {
     console.error("Error logging in", error);
@@ -57,4 +59,4 @@ export const login = async ({
     setIsError(true);
     setIsSuccess(false);
   }
-  };
+};
