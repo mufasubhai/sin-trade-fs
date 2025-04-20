@@ -5,7 +5,6 @@ import { login } from "../../api/Auth";
 import { useAuth } from "../../context/useAuth";
 import { useUI } from "../../context/useUI";
 
-
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -15,9 +14,15 @@ export default function Login() {
   // here we're pulling
   const { loginUser, logoutUser } = useAuth();
   // const navigate = useNavigate();
-  const { isLoading, isError, isSuccess, setIsLoading, setIsError, setIsSuccess, navigate} = useUI();
-
-
+  const {
+    isLoading,
+    isError,
+    isSuccess,
+    setIsLoading,
+    setIsError,
+    setIsSuccess,
+    navigate,
+  } = useUI();
 
   const handleLogin = () => {
     // console.log("handleLogin");
@@ -64,7 +69,6 @@ export default function Login() {
           }}
         />
 
-
         <Button
           text="Login"
           onClick={handleLogin}
@@ -74,17 +78,15 @@ export default function Login() {
         />
         <Button
           text="Register"
-          onClick={() => void navigate('/register')}
+          onClick={() => void navigate("/register")}
           disabled={false}
           isLoading={false}
           isError={isError}
         />
-        
-       {/* want to change this to a reusable text type component */}
-        {isError ? <div>Invalid credentials. Please try again.</div>
-        : <></>}
 
-        </div>
+        {/* want to change this to a reusable text type component */}
+        {isError ? <div>Invalid credentials. Please try again.</div> : <></>}
       </div>
+    </div>
   );
 }

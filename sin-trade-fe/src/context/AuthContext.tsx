@@ -1,5 +1,5 @@
 import React, { createContext, useState } from "react";
-import {  UserResponse } from "../interfaces/UserInterface";
+import { UserResponse } from "../interfaces/UserInterface";
 
 // what is missing is a function to disable tokens after a certain amount of time.
 // we should save the date of creation of the tokens and disable them after a certain amount of time.

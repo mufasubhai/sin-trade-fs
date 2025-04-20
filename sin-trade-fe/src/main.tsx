@@ -17,9 +17,30 @@ createRoot(document.getElementById("root")!).render(
       <BrowserRouter>
         <UIProvider>
           <Routes>
-            <Route path="/" element={<UnprotectedRoute><App /></UnprotectedRoute>} />
-            <Route path="login" element={<UnprotectedRoute><Login /></UnprotectedRoute>} />
-            <Route path="register" element={<UnprotectedRoute><Register /></UnprotectedRoute>} />
+            <Route
+              path="/"
+              element={
+                <UnprotectedRoute>
+                  <App />
+                </UnprotectedRoute>
+              }
+            />
+            <Route
+              path="login"
+              element={
+                <UnprotectedRoute>
+                  <Login />
+                </UnprotectedRoute>
+              }
+            />
+            <Route
+              path="register"
+              element={
+                <UnprotectedRoute>
+                  <Register />
+                </UnprotectedRoute>
+              }
+            />
 
             <Route
               path="/dashboard"

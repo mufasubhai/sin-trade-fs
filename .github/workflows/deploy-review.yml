@@ -88,7 +88,7 @@ jobs:
 
       - name: Run data science container
         run: docker run -d --name sin-trade-ds -p 5004:5004
-          -e FLASK_ENV=production 
+          -e FLASK_ENV=production
           -e PORT=5004
           -e SUPABASE_URL=${{ secrets.SUPABASE_URL }}
           -e SUPABASE_KEY=${{ secrets.SUPABASE_KEY }}
