@@ -3,6 +3,7 @@
     // ... other options ...
     "sourceMap": true,
     "inlineSourceMap": false,
+    "strict": true,
     // ... other options ...
   },
   "files": [],
