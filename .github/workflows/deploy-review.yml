@@ -45,6 +45,7 @@ jobs:
 
       - name: Run frontend container
         run: docker run -d --name sin-trade-fe -p 5173:5173 sin-trade-fe:latest
+          -e VITE_BACKEND_URL=${{ secrets.VITE_BACKEND_URL }}
 
       - name: Wait for frontend to be healthy
         run: |
