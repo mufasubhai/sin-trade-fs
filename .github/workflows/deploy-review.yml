@@ -44,17 +44,16 @@ jobs:
         run: docker build -t sin-trade-ds:latest --build-arg PORT=5004 ./sin-trade-ds
 
       - name: Run frontend container
-        run: docker run -d --name sin-trade-fe -p 5173:5173 sin-trade-fe:latest
-          -e VITE_BACKEND_URL=${{ secrets.VITE_BACKEND_URL }}
+        run: docker run -d --name sin-trade-fe -p 5173:5173 -e VITE_BACKEND_URL=${{ secrets.VITE_BACKEND_URL }} sin-trade-fe:latest
 
       - name: Wait for frontend to be healthy
         run: |
-          for i in {1..8}; do
+          for i in {1..4}; do
             if [ "$(docker inspect -f '{{.State.Health.Status}}' sin-trade-fe)" == "healthy" ]; then
               echo "Frontend container is healthy"
               break
             fi
-            if [ $i -eq 15 ]; then
+            if [ $i -eq 4 ]; then
               echo "Frontend container failed to become healthy"
               docker logs sin-trade-fe
               exit 1
@@ -64,21 +63,16 @@ jobs:
           done
 
       - name: Run backend container
-        run: docker run -d --name sin-trade-be -p 5002:5002
-          -e FLASK_ENV=production
-          -e PORT=5002
-          -e SUPABASE_URL=${{ secrets.SUPABASE_URL }}
-          -e SUPABASE_KEY=${{ secrets.SUPABASE_KEY }}
-          sin-trade-be:latest
+        run: docker run -d --name sin-trade-be -p 5002:5002 -e FLASK_ENV=production -e PORT=5002 -e SUPABASE_URL=${{ secrets.SUPABASE_URL }}-e SUPABASE_KEY=${{ secrets.SUPABASE_KEY }} sin-trade-be:latest
 
       - name: Wait for backend to be healthy
         run: |
-          for i in {1..8}; do
+          for i in {1..4}; do
             if [ "$(docker inspect -f '{{.State.Health.Status}}' sin-trade-be)" == "healthy" ]; then
               echo "Backend container is healthy"
               break
             fi
-            if [ $i -eq 15 ]; then
+            if [ $i -eq 4 ]; then
               echo "Backend container failed to become healthy"
               docker logs sin-trade-be
               exit 1
@@ -88,21 +82,16 @@ jobs:
           done
 
       - name: Run data science container
-        run: docker run -d --name sin-trade-ds -p 5004:5004
-          -e FLASK_ENV=production
-          -e PORT=5004
-          -e SUPABASE_URL=${{ secrets.SUPABASE_URL }}
-          -e SUPABASE_KEY=${{ secrets.SUPABASE_KEY }}
-          sin-trade-ds:latest
+        run: docker run -d --name sin-trade-ds -p 5004:5004 -e FLASK_ENV=production -e PORT=5004 -e SUPABASE_URL=${{ secrets.SUPABASE_URL }} -e SUPABASE_KEY=${{ secrets.SUPABASE_KEY }} sin-trade-ds:latest
 
       - name: Wait for data science to be healthy
         run: |
-          for i in {1..8}; do
+          for i in {1..4}; do
             if [ "$(docker inspect -f '{{.State.Health.Status}}' sin-trade-ds)" == "healthy" ]; then
               echo "Data science container is healthy"
               break
             fi
-            if [ $i -eq 15 ]; then
+            if [ $i -eq 4 ]; then
               echo "DS container failed to become healthy"
               docker logs sin-trade-ds
               exit 1
