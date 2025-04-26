@@ -49,7 +49,7 @@ jobs:
 
       - name: Wait for frontend to be healthy
         run: |
-          for i in {1..4}; do
+          for i in {1..8}; do
             if [ "$(docker inspect -f '{{.State.Health.Status}}' sin-trade-fe)" == "healthy" ]; then
               echo "Frontend container is healthy"
               break
@@ -73,7 +73,7 @@ jobs:
 
       - name: Wait for backend to be healthy
         run: |
-          for i in {1..4}; do
+          for i in {1..8}; do
             if [ "$(docker inspect -f '{{.State.Health.Status}}' sin-trade-be)" == "healthy" ]; then
               echo "Backend container is healthy"
               break
@@ -97,7 +97,7 @@ jobs:
 
       - name: Wait for data science to be healthy
         run: |
-          for i in {1..4}; do
+          for i in {1..8}; do
             if [ "$(docker inspect -f '{{.State.Health.Status}}' sin-trade-ds)" == "healthy" ]; then
               echo "Data science container is healthy"
               break
