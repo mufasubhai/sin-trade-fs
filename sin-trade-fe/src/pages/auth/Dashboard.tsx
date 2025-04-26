@@ -1,6 +1,6 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
+import { useState } from "react";
 import {
   Dialog,
   DialogBackdrop,
@@ -10,7 +10,7 @@ import {
   MenuItem,
   MenuItems,
   TransitionChild,
-} from '@headlessui/react'
+} from "@headlessui/react";
 import {
   Bars3Icon,
   BellIcon,
@@ -21,33 +21,34 @@ import {
   HomeIcon,
   UsersIcon,
   XMarkIcon,
-} from '@heroicons/react/24/outline'
-import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/react/20/solid'
-import { useAuth } from '../../context/useAuth'
+} from "@heroicons/react/24/outline";
+import {
+  ChevronDownIcon,
+  MagnifyingGlassIcon,
+} from "@heroicons/react/20/solid";
+import { useAuth } from "../../context/useAuth";
 
 const navigation = [
-  { name: 'Dashboard', href: '#', icon: HomeIcon, current: true },
-  { name: 'Team', href: '#', icon: UsersIcon, current: false },
-  { name: 'Projects', href: '#', icon: FolderIcon, current: false },
-  { name: 'Calendar', href: '#', icon: CalendarIcon, current: false },
-  { name: 'Documents', href: '#', icon: DocumentDuplicateIcon, current: false },
-  { name: 'Reports', href: '#', icon: ChartPieIcon, current: false },
-]
+  { name: "Dashboard", href: "#", icon: HomeIcon, current: true },
+  { name: "Team", href: "#", icon: UsersIcon, current: false },
+  { name: "Projects", href: "#", icon: FolderIcon, current: false },
+  { name: "Calendar", href: "#", icon: CalendarIcon, current: false },
+  { name: "Documents", href: "#", icon: DocumentDuplicateIcon, current: false },
+  { name: "Reports", href: "#", icon: ChartPieIcon, current: false },
+];
 
 function classNames(...classes: string[]) {
-    return classes.filter(Boolean).join(' ')
+  return classes.filter(Boolean).join(" ");
 }
 
 export default function Dashboard() {
+  const { logoutUser } = useAuth();
 
-    const { logoutUser } = useAuth();
-
-
-    const userNavigation = [
-      { name: 'Your profile',},
-      { name: 'Sign out', function: () => logoutUser()},
-    ]
-    const [sidebarOpen, setSidebarOpen] = useState(false)
+  const userNavigation = [
+    { name: "Your profile" },
+    { name: "Sign out", function: () => logoutUser() },
+  ];
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
     <>
@@ -60,7 +61,11 @@ export default function Dashboard() {
         ```
       */}
       <div>
-        <Dialog open={sidebarOpen} onClose={setSidebarOpen} className="relative z-50 lg:hidden">
+        <Dialog
+          open={sidebarOpen}
+          onClose={setSidebarOpen}
+          className="relative z-50 lg:hidden"
+        >
           <DialogBackdrop
             transition
             className="fixed inset-0 bg-gray-900/80 transition-opacity duration-300 ease-linear data-closed:opacity-0"
@@ -73,9 +78,16 @@ export default function Dashboard() {
             >
               <TransitionChild>
                 <div className="absolute top-0 left-full flex w-16 justify-center pt-5 duration-300 ease-in-out data-closed:opacity-0">
-                  <button type="button" onClick={() => setSidebarOpen(false)} className="-m-2.5 p-2.5">
+                  <button
+                    type="button"
+                    onClick={() => setSidebarOpen(false)}
+                    className="-m-2.5 p-2.5"
+                  >
                     <span className="sr-only">Close sidebar</span>
-                    <XMarkIcon aria-hidden="true" className="size-6 text-white" />
+                    <XMarkIcon
+                      aria-hidden="true"
+                      className="size-6 text-white"
+                    />
                   </button>
                 </div>
               </TransitionChild>
@@ -96,12 +108,15 @@ export default function Dashboard() {
                           href={item.href}
                           className={classNames(
                             item.current
-                              ? 'bg-gray-800 text-white'
-                              : 'text-gray-400 hover:bg-gray-800 hover:text-white',
-                            'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold',
+                              ? "bg-gray-800 text-white"
+                              : "text-gray-400 hover:bg-gray-800 hover:text-white",
+                            "group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold"
                           )}
                         >
-                          <item.icon aria-hidden="true" className="size-6 shrink-0" />
+                          <item.icon
+                            aria-hidden="true"
+                            className="size-6 shrink-0"
+                          />
                           {item.name}
                         </a>
                       </li>
@@ -118,7 +133,7 @@ export default function Dashboard() {
           <div className="flex h-16 shrink-0 items-center justify-center">
             <img
               alt="Your Company"
-              src="https://tailwindui.com/plus/img/logos/mark.svg?color=indigo&shade=500"
+              src="https://tailwindui.com/plus/img/logo/s/mark.svg?color=indigo&shade=500"
               className="h-8 w-auto"
             />
           </div>
@@ -129,8 +144,10 @@ export default function Dashboard() {
                   <a
                     href={item.href}
                     className={classNames(
-                      item.current ? 'bg-gray-800 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white',
-                      'group flex gap-x-3 rounded-md p-3 text-sm/6 font-semibold',
+                      item.current
+                        ? "bg-gray-800 text-white"
+                        : "text-gray-400 hover:bg-gray-800 hover:text-white",
+                      "group flex gap-x-3 rounded-md p-3 text-sm/6 font-semibold"
                     )}
                   >
                     <item.icon aria-hidden="true" className="size-6 shrink-0" />
@@ -144,13 +161,20 @@ export default function Dashboard() {
 
         <div className="lg:pl-20">
           <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-xs sm:gap-x-6 sm:px-6 lg:px-8">
-            <button type="button" onClick={() => setSidebarOpen(true)} className="-m-2.5 p-2.5 text-gray-700 lg:hidden">
+            <button
+              type="button"
+              onClick={() => setSidebarOpen(true)}
+              className="-m-2.5 p-2.5 text-gray-700 lg:hidden"
+            >
               <span className="sr-only">Open sidebar</span>
               <Bars3Icon aria-hidden="true" className="size-6" />
             </button>
 
             {/* Separator */}
-            <div aria-hidden="true" className="h-6 w-px bg-gray-900/10 lg:hidden" />
+            <div
+              aria-hidden="true"
+              className="h-6 w-px bg-gray-900/10 lg:hidden"
+            />
 
             <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
               <form action="#" method="GET" className="grid flex-1 grid-cols-1">
@@ -167,16 +191,22 @@ export default function Dashboard() {
                 />
               </form>
               <div className="flex items-center gap-x-4 lg:gap-x-6">
-                <button type="button" className="-m-2.5 p-2.5 text-gray-400 hover:text-gray-500">
+                <button
+                  type="button"
+                  className="-m-2.5 p-2.5 text-gray-400 hover:text-gray-500"
+                >
                   <span className="sr-only">View notifications</span>
                   <BellIcon aria-hidden="true" className="size-6" />
                 </button>
 
                 {/* Separator */}
-                <div aria-hidden="true" className="hidden lg:block lg:h-6 lg:w-px lg:bg-gray-900/10" />
+                <div
+                  aria-hidden="true"
+                  className="hidden lg:block lg:h-6 lg:w-px lg:bg-gray-900/10"
+                />
 
                 {/* Profile dropdown */}
-                <Menu as="div" className="relative">
+                <Menu as="div" className="relative" data-testid="user-menu">
                   <MenuButton className="-m-1.5 flex items-center p-1.5">
                     <span className="sr-only">Open user menu</span>
                     <img
@@ -185,10 +215,16 @@ export default function Dashboard() {
                       className="size-8 rounded-full bg-gray-50"
                     />
                     <span className="hidden lg:flex lg:items-center">
-                      <span aria-hidden="true" className="ml-4 text-sm/6 font-semibold text-gray-900">
+                      <span
+                        aria-hidden="true"
+                        className="ml-4 text-sm/6 font-semibold text-gray-900"
+                      >
                         Tom Cook
                       </span>
-                      <ChevronDownIcon aria-hidden="true" className="ml-2 size-5 text-gray-400" />
+                      <ChevronDownIcon
+                        aria-hidden="true"
+                        className="ml-2 size-5 text-gray-400"
+                      />
                     </span>
                   </MenuButton>
                   <MenuItems
@@ -197,15 +233,16 @@ export default function Dashboard() {
                   >
                     {userNavigation.map((item) => (
                       <MenuItem key={item.name}>
-
-                        < div  className="block px-3 py-1 text-sm/6 text-gray-900 data-focus:bg-gray-50 data-focus:outline-hidden"
-                          
+                        <div
+                          className="block px-3 py-1 text-sm/6 text-gray-900 data-focus:bg-gray-50 data-focus:outline-hidden"
                           onClick={() => {
-                            if (item.function   ) {
+                            if (item.function) {
                               item.function();
                             }
                           }}
-                        >{item.name}</div>
+                        >
+                          {item.name}
+                        </div>
                       </MenuItem>
                     ))}
                   </MenuItems>
@@ -215,7 +252,9 @@ export default function Dashboard() {
           </div>
 
           <main className="xl:pl-96">
-            <div className="px-4 py-10 sm:px-6 lg:px-8 lg:py-6">{/* Main area */}</div>
+            <div className="px-4 py-10 sm:px-6 lg:px-8 lg:py-6">
+              {/* Main area */}
+            </div>
           </main>
         </div>
 
@@ -224,5 +263,5 @@ export default function Dashboard() {
         </aside>
       </div>
     </>
-  )
+  );
 }

@@ -16,7 +16,7 @@
         "run",
         "--no-debugger",
         "--no-reload",
-        "--port=5002"  
+        "--port=5002"
       ],
       "jinja": true,
       "justMyCode": true,
@@ -38,7 +38,7 @@
         "run",
         "--no-debugger",
         "--no-reload",
-        "--port=5004"  
+        "--port=5004"
       ],
       "jinja": true,
       "justMyCode": true,
@@ -60,7 +60,6 @@
       },
       "console": "integratedTerminal"
     },
-
     {
       "name": "sin-trade-fe",
       "type": "chrome",
@@ -80,17 +79,20 @@
       ],
       "port": 9222
     },
-    
     {
       "type": "node",
       "request": "launch",
-      "name": "Debug Current Javascript Test",
+      "name": "Debug Vitest",
       "autoAttachChildProcesses": true,
-      "skipFiles": ["<node_internals>/**", "**/node_modules/**"],
-      "program": "${workspaceRoot}/sin-trade-fe/node_modules/vitest/vitest.mjs",
-      "args": ["run", "${relativeFile}"],
-      "smartStep": true,
-      "console": "integratedTerminal"
+      "program": "${workspaceFolder}/sin-trade-fe/node_modules/vitest/vitest.mjs",
+      "args": [
+        "run",
+        "--inspect-brk",
+        "${file}"
+      ],
+      "skipFiles": [
+        "<node_internals>/**"
+      ]
     }
   ],
   "compounds": [
