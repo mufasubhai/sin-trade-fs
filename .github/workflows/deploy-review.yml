@@ -35,16 +35,16 @@ jobs:
             ${{ runner.os }}-buildx-
 
       - name: Build frontend Docker image
-        run: docker build --build-arg VITE_BACKEND_URL=${{ secrets.VITE_BACKEND_URL }} -t sin-trade-fe:latest --build-arg PORT=5173 ./sin-trade-fe
+        run: docker build --build-arg VITE_BACKEND_URL=${{ vars.VITE_BACKEND_URL }} -t sin-trade-fe:latest --build-arg PORT=5173 ./sin-trade-fe
 
       - name: Build backend Docker image
-        run: docker build --build-arg SUPABASE_URL=${{ secrets.SUPABASE_URL }} --build-arg SUPABASE_KEY=${{ secrets.SUPABASE_KEY }} -t sin-trade-be:latest --build-arg PORT=5002 ./sin-trade-be
+        run: docker build --build-arg SUPABASE_URL=${{ vars.SUPABASE_URL }} --build-arg SUPABASE_KEY=${{ vars.SUPABASE_KEY }} -t sin-trade-be:latest --build-arg PORT=5002 ./sin-trade-be
 
       - name: Build data science Docker image
-        run: docker build --build-arg SUPABASE_URL=${{ secrets.SUPABASE_URL }} --build-arg SUPABASE_KEY=${{ secrets.SUPABASE_KEY }} -t sin-trade-ds:latest --build-arg PORT=5004 ./sin-trade-ds
+        run: docker build --build-arg SUPABASE_URL=${{ vars.SUPABASE_URL }} --build-arg SUPABASE_KEY=${{ vars.SUPABASE_KEY }} -t sin-trade-ds:latest --build-arg PORT=5004 ./sin-trade-ds
 
       - name: Run frontend container
-        run: docker run -d --name sin-trade-fe -p 5173:5173 -e VITE_BACKEND_URL=${{ secrets.VITE_BACKEND_URL }} sin-trade-fe:latest
+        run: docker run -d --name sin-trade-fe -p 5173:5173 -e VITE_BACKEND_URL=${{ vars.VITE_BACKEND_URL }} sin-trade-fe:latest
 
       - name: Wait for frontend to be healthy
         run: |
@@ -63,7 +63,7 @@ jobs:
           done
 
       - name: Run backend container
-        run: docker run -d --name sin-trade-be -p 5002:5002 -e FLASK_ENV=production -e PORT=5002 -e SUPABASE_URL=${{ secrets.SUPABASE_URL }} -e SUPABASE_KEY=${{ secrets.SUPABASE_KEY }} sin-trade-be:latest
+        run: docker run -d --name sin-trade-be -p 5002:5002 -e FLASK_ENV=production -e PORT=5002 -e SUPABASE_URL=${{ vars.SUPABASE_URL }} -e SUPABASE_KEY=${{ vars.SUPABASE_KEY }} sin-trade-be:latest
 
       - name: Wait for backend to be healthy
         run: |
@@ -82,7 +82,7 @@ jobs:
           done
 
       - name: Run data science container
-        run: docker run -d --name sin-trade-ds -p 5004:5004 -e FLASK_ENV=production -e PORT=5004 -e SUPABASE_URL=${{ secrets.SUPABASE_URL }} -e SUPABASE_KEY=${{ secrets.SUPABASE_KEY }} sin-trade-ds:latest
+        run: docker run -d --name sin-trade-ds -p 5004:5004 -e FLASK_ENV=production -e PORT=5004 -e SUPABASE_URL=${{ vars.SUPABASE_URL }} -e SUPABASE_KEY=${{ vars.SUPABASE_KEY }} sin-trade-ds:latest
 
       - name: Wait for data science to be healthy
         run: |
@@ -123,12 +123,12 @@ jobs:
 
       - name: Authenticate with Heroku
         env:
-          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+          HEROKU_API_KEY: ${{ vars.HEROKU_API_KEY }}
         run: echo $HEROKU_API_KEY | heroku auth:token
 
       - name: Login to Heroku Container Registry
         env:
-          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+          HEROKU_API_KEY: ${{ vars.HEROKU_API_KEY }}
         run: echo $HEROKU_API_KEY | docker login --username=_ --password-stdin registry.heroku.com
 
       - name: Build and push frontend Docker image to Heroku
@@ -138,7 +138,7 @@ jobs:
 
       - name: Release frontend app
         env:
-          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+          HEROKU_API_KEY: ${{ vars.HEROKU_API_KEY }}
         run: heroku container:release web --app sin-trade-fe
 
       - name: Build and push backend Docker image to Heroku
@@ -148,7 +148,7 @@ jobs:
 
       - name: Release backend app
         env:
-          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+          HEROKU_API_KEY: ${{ vars.HEROKU_API_KEY }}
         run: heroku container:release web --app sin-trade-be
 
       - name: Build and push data science Docker image to Heroku
@@ -158,5 +158,5 @@ jobs:
 
       - name: Release data science app
         env:
-          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+          HEROKU_API_KEY: ${{ vars.HEROKU_API_KEY }}
         run: heroku container:release web --app sin-trade-ds
