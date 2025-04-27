@@ -123,12 +123,12 @@ jobs:
 
       - name: Authenticate with Heroku
         env:
-          HEROKU_API_KEY: ${{ vars.HEROKU_API_KEY }}
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         run: echo $HEROKU_API_KEY | heroku auth:token
 
       - name: Login to Heroku Container Registry
         env:
-          HEROKU_API_KEY: ${{ vars.HEROKU_API_KEY }}
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         run: echo $HEROKU_API_KEY | docker login --username=_ --password-stdin registry.heroku.com
 
       - name: Build and push frontend Docker image to Heroku
@@ -138,7 +138,7 @@ jobs:
 
       - name: Release frontend app
         env:
-          HEROKU_API_KEY: ${{ vars.HEROKU_API_KEY }}
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         run: heroku container:release web --app sin-trade-fe
 
       - name: Build and push backend Docker image to Heroku
@@ -148,7 +148,7 @@ jobs:
 
       - name: Release backend app
         env:
-          HEROKU_API_KEY: ${{ vars.HEROKU_API_KEY }}
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         run: heroku container:release web --app sin-trade-be
 
       - name: Build and push data science Docker image to Heroku
@@ -158,5 +158,5 @@ jobs:
 
       - name: Release data science app
         env:
-          HEROKU_API_KEY: ${{ vars.HEROKU_API_KEY }}
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         run: heroku container:release web --app sin-trade-ds
