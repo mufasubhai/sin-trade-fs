@@ -1,6 +1,9 @@
 # Use the official Node.js image from the Docker Hub
 FROM node:22.1.0
 
+
+ARG VITE_BACKEND_URL
+ENV VITE_BACKEND_URL=$VITE_BACKEND_URL
 # Set the working directory
 WORKDIR /app
 

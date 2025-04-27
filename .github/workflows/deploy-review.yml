@@ -35,13 +35,13 @@ jobs:
             ${{ runner.os }}-buildx-
 
       - name: Build frontend Docker image
-        run: docker build -t sin-trade-fe:latest --build-arg PORT=5173 ./sin-trade-fe
+        run: docker build --build-arg VITE_BACKEND_URL=${{ secrets.VITE_BACKEND_URL }} -t sin-trade-fe:latest --build-arg PORT=5173 ./sin-trade-fe
 
       - name: Build backend Docker image
-        run: docker build -t sin-trade-be:latest --build-arg PORT=5002 ./sin-trade-be
+        run: docker build --build-arg SUPABASE_URL=${{ secrets.SUPABASE_URL }} --build-arg SUPABASE_KEY=${{ secrets.SUPABASE_KEY }} -t sin-trade-be:latest --build-arg PORT=5002 ./sin-trade-be
 
       - name: Build data science Docker image
-        run: docker build -t sin-trade-ds:latest --build-arg PORT=5004 ./sin-trade-ds
+        run: docker build --build-arg SUPABASE_URL=${{ secrets.SUPABASE_URL }} --build-arg SUPABASE_KEY=${{ secrets.SUPABASE_KEY }} -t sin-trade-ds:latest --build-arg PORT=5004 ./sin-trade-ds
 
       - name: Run frontend container
         run: docker run -d --name sin-trade-fe -p 5173:5173 -e VITE_BACKEND_URL=${{ secrets.VITE_BACKEND_URL }} sin-trade-fe:latest
