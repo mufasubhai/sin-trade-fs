@@ -147,10 +147,6 @@ jobs:
       - name: Build and push backend Docker image to Heroku
         run: |
           docker build \
-            --build-arg SUPABASE_URL=${{ secrets.SUPABASE_URL }} \
-            --build-arg SUPABASE_URL=${{ secrets.CORS_ORIGINS }} \
-            --build-arg SUPABASE_KEY=${{ secrets.SUPABASE_KEY }} \
-            --build-arg ALPHA_VANTAGE=${{ secrets.ALPHA_VANTAGE }} \
             --build-arg PORT=5002 \
             -t registry.heroku.com/sin-trade-be/web ./sin-trade-be
           docker push registry.heroku.com/sin-trade-be/web
@@ -163,12 +159,8 @@ jobs:
       - name: Build and push data science Docker image to Heroku
         run: |
           docker build \
-            --build-arg SUPABASE_URL=${{ secrets.SUPABASE_URL }} \
-            --build-arg SUPABASE_URL=${{ secrets.CORS_ORIGINS }} \
-            --build-arg SUPABASE_KEY=${{ secrets.SUPABASE_KEY }} \
-            --build-arg ALPHA_VANTAGE=${{ secrets.ALPHA_VANTAGE }} \
             --build-arg PORT=5004 \
-          -t registry.heroku.com/sin-trade-ds/web ./sin-trade-ds
+            -t registry.heroku.com/sin-trade-ds/web ./sin-trade-ds
           docker push registry.heroku.com/sin-trade-ds/web
 
       - name: Release data science app
