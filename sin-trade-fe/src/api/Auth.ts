@@ -20,7 +20,8 @@ export const login = async ({
 }) => {
   setIsLoading(true);
   try {
-    console.log("DATA URL", dataUrl);
+    console.log("DATA URL", dataUrl, "DATA URL");
+    console.log("ENVIRONMENT", import.meta.env, "ENVIRONMENT");
 
     const response = await fetch(`${dataUrl}auth/login`, {
       headers: {
