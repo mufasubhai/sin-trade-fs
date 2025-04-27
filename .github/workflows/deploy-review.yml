@@ -35,7 +35,7 @@ jobs:
             ${{ runner.os }}-buildx-
 
       - name: Build frontend Docker image
-        run: docker build --build-arg VITE_BACKEND_URL=${{ vars.VITE_BACKEND_URL }} -t sin-trade-fe:latest --build-arg PORT=5173 ./sin-trade-fe
+        run: docker build --build-arg VITE_BACKEND_URL=${{ secrets.VITE_BACKEND_URL }} -t sin-trade-fe:latest --build-arg PORT=5173 ./sin-trade-fe
 
       - name: Build backend Docker image
         run: docker build --build-arg SUPABASE_URL=${{ secrets.SUPABASE_URL }} --build-arg SUPABASE_KEY=${{ secrets.SUPABASE_KEY }} -t sin-trade-be:latest --build-arg PORT=5002 ./sin-trade-be
@@ -134,7 +134,7 @@ jobs:
       - name: Build and push frontend Docker image to Heroku
         run: |
           docker build \
-            --build-arg VITE_BACKEND_URL=${{ vars.VITE_BACKEND_URL }} \
+            --build-arg VITE_BACKEND_URL=${{ secrets.VITE_BACKEND_URL }} \
             --build-arg PORT=5173 \
             -t registry.heroku.com/sin-trade-fe/web ./sin-trade-fe
           docker push registry.heroku.com/sin-trade-fe/web
