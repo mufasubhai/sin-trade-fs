@@ -1,39 +1,52 @@
-"use client";
+// "use client";
 
-import { useState } from "react";
 import {
-  Dialog,
-  DialogBackdrop,
-  DialogPanel,
+  Description,
+  Label,
+} from "../../components/catalyst_components/fieldset";
+import {
+  Switch,
+  SwitchField,
+} from "../../components/catalyst_components/switch";
+import { useState } from "react";
+import Input from "../../components/Input";
+
+import {
+  // Dialog,
+  // DialogBackdrop,
+  // DialogPanel,
   Menu,
   MenuButton,
   MenuItem,
   MenuItems,
-  TransitionChild,
+  // TransitionChild,
 } from "@headlessui/react";
 import {
-  Bars3Icon,
+  // Bars3Icon,
   BellIcon,
   CalendarIcon,
   ChartPieIcon,
-  DocumentDuplicateIcon,
-  FolderIcon,
+  // DocumentDuplic/ateIcon,
+  // FolderIcon,
+  PlusIcon,
   HomeIcon,
-  UsersIcon,
-  XMarkIcon,
+  UserCircleIcon,
+  // UsersIcon,
+  // XMarkIcon,
 } from "@heroicons/react/24/outline";
 import {
   ChevronDownIcon,
   MagnifyingGlassIcon,
 } from "@heroicons/react/20/solid";
 import { useAuth } from "../../context/useAuth";
+import GenericModal from "../../components/GenericModal";
 
 const navigation = [
   { name: "Dashboard", href: "#", icon: HomeIcon, current: true },
-  { name: "Team", href: "#", icon: UsersIcon, current: false },
-  { name: "Projects", href: "#", icon: FolderIcon, current: false },
+  // { name: "Team", href: "#", icon: UsersIcon, current: false },
+  // { name: "Projects", href: "#", icon: FolderIcon, current: false },
   { name: "Calendar", href: "#", icon: CalendarIcon, current: false },
-  { name: "Documents", href: "#", icon: DocumentDuplicateIcon, current: false },
+  // { name: "Documents", href: "#", icon: DocumentDuplicateIcon, current: false },
   { name: "Reports", href: "#", icon: ChartPieIcon, current: false },
 ];
 
@@ -45,10 +58,17 @@ export default function Dashboard() {
   const { logoutUser } = useAuth();
 
   const userNavigation = [
-    { name: "Your profile" },
+    // { name: "Your profile" },
     { name: "Sign out", function: () => logoutUser() },
   ];
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  // const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const { user } = useAuth();
+
+  const [searchString, setSearchString] = useState("");
+  const [addModalOpen, setAddModalOpen] = useState(false);
+  const [tickerCode, setTickerCode] = useState("");
+  const [isCrypto, setIsCrypto] = useState(true);
 
   return (
     <>
@@ -61,82 +81,8 @@ export default function Dashboard() {
         ```
       */}
       <div>
-        <Dialog
-          open={sidebarOpen}
-          onClose={setSidebarOpen}
-          className="relative z-50 lg:hidden"
-        >
-          <DialogBackdrop
-            transition
-            className="fixed inset-0 bg-gray-900/80 transition-opacity duration-300 ease-linear data-closed:opacity-0"
-          />
-
-          <div className="fixed inset-0 flex">
-            <DialogPanel
-              transition
-              className="relative mr-16 flex w-full max-w-xs flex-1 transform transition duration-300 ease-in-out data-closed:-translate-x-full"
-            >
-              <TransitionChild>
-                <div className="absolute top-0 left-full flex w-16 justify-center pt-5 duration-300 ease-in-out data-closed:opacity-0">
-                  <button
-                    type="button"
-                    onClick={() => setSidebarOpen(false)}
-                    className="-m-2.5 p-2.5"
-                  >
-                    <span className="sr-only">Close sidebar</span>
-                    <XMarkIcon
-                      aria-hidden="true"
-                      className="size-6 text-white"
-                    />
-                  </button>
-                </div>
-              </TransitionChild>
-
-              <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900 px-6 pb-2 ring-1 ring-white/10">
-                <div className="flex h-16 shrink-0 items-center">
-                  <img
-                    alt="Your Company"
-                    src="https://tailwindui.com/plus/img/logos/mark.svg?color=indigo&shade=500"
-                    className="h-8 w-auto"
-                  />
-                </div>
-                <nav className="flex flex-1 flex-col">
-                  <ul role="list" className="-mx-2 flex-1 space-y-1">
-                    {navigation.map((item) => (
-                      <li key={item.name}>
-                        <a
-                          href={item.href}
-                          className={classNames(
-                            item.current
-                              ? "bg-gray-800 text-white"
-                              : "text-gray-400 hover:bg-gray-800 hover:text-white",
-                            "group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold"
-                          )}
-                        >
-                          <item.icon
-                            aria-hidden="true"
-                            className="size-6 shrink-0"
-                          />
-                          {item.name}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </nav>
-              </div>
-            </DialogPanel>
-          </div>
-        </Dialog>
-
         {/* Static sidebar for desktop */}
         <div className="hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:block lg:w-20 lg:overflow-y-auto lg:bg-gray-900 lg:pb-4">
-          <div className="flex h-16 shrink-0 items-center justify-center">
-            <img
-              alt="Your Company"
-              src="https://tailwindui.com/plus/img/logo/s/mark.svg?color=indigo&shade=500"
-              className="h-8 w-auto"
-            />
-          </div>
           <nav className="mt-8">
             <ul role="list" className="flex flex-col items-center space-y-1">
               {navigation.map((item) => (
@@ -161,15 +107,6 @@ export default function Dashboard() {
 
         <div className="lg:pl-20">
           <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-xs sm:gap-x-6 sm:px-6 lg:px-8">
-            <button
-              type="button"
-              onClick={() => setSidebarOpen(true)}
-              className="-m-2.5 p-2.5 text-gray-700 lg:hidden"
-            >
-              <span className="sr-only">Open sidebar</span>
-              <Bars3Icon aria-hidden="true" className="size-6" />
-            </button>
-
             {/* Separator */}
             <div
               aria-hidden="true"
@@ -183,6 +120,10 @@ export default function Dashboard() {
                   type="search"
                   placeholder="Search"
                   aria-label="Search"
+                  onChange={(e) => {
+                    setSearchString(e.target.value);
+                    // console.log(e.target.value);
+                  }}
                   className="col-start-1 row-start-1 block size-full bg-white pl-8 text-base text-gray-900 outline-hidden placeholder:text-gray-400 sm:text-sm/6"
                 />
                 <MagnifyingGlassIcon
@@ -209,17 +150,26 @@ export default function Dashboard() {
                 <Menu as="div" className="relative" data-testid="user-menu">
                   <MenuButton className="-m-1.5 flex items-center p-1.5">
                     <span className="sr-only">Open user menu</span>
-                    <img
-                      alt=""
-                      src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                      className="size-8 rounded-full bg-gray-50"
-                    />
+
+                    {user?.avatarUrl ? (
+                      <img
+                        alt={user.username ?? ""}
+                        src={user.avatarUrl ?? ""}
+                        className="size-8 rounded-full bg-gray-50"
+                      />
+                    ) : (
+                      <UserCircleIcon
+                        aria-hidden="true"
+                        className="pointer-events-none col-start-1 row-start-1 size-5 self-center text-gray-400"
+                      />
+                    )}
+
                     <span className="hidden lg:flex lg:items-center">
                       <span
                         aria-hidden="true"
                         className="ml-4 text-sm/6 font-semibold text-gray-900"
                       >
-                        Tom Cook
+                        {user?.firstName + " " + user?.lastName}
                       </span>
                       <ChevronDownIcon
                         aria-hidden="true"
@@ -251,17 +201,90 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <main className="xl:pl-96">
+          <main className="xl:pl-12">
+            <div className="max-w-96 flex flex-row justify-between">
+              <div className="">Current Active Assets</div>
+              <div className="">
+                <button onClick={() => setAddModalOpen(true)}>Add Asset</button>
+              </div>
+            </div>
+
+            <GenericModal
+              open={addModalOpen}
+              setOpen={setAddModalOpen}
+              title="Add Asset"
+              child={
+                <AddAssetModal
+                  tickerCode={tickerCode}
+                  setTickerCode={setTickerCode}
+                  isCrypto={isCrypto}
+                  setIsCrypto={setIsCrypto}
+                />
+              }
+              icon={<PlusIcon />}
+              confirmFunction={() => {
+                console.log("hello!");
+              }}
+              confirmArgs={[]}
+            />
             <div className="px-4 py-10 sm:px-6 lg:px-8 lg:py-6">
-              {/* Main area */}
+              {Object.values(user?.activeAssets ?? {}).map((asset) => {
+                if (
+                  searchString &&
+                  !asset.tickerName
+                    .toLowerCase()
+                    .includes(searchString.toLowerCase())
+                ) {
+                  return null;
+                }
+                // need to add some additional styling to the asset. This should end up being a column thathas the ticker name, last updated, and a button to remove the asset.
+                // we also need to add an updated value to the object in the DB.
+                return (
+                  <div key={asset.assetId}>
+                    <h1>{asset.tickerName}</h1>
+                  </div>
+                );
+              })}
             </div>
           </main>
         </div>
-
-        <aside className="fixed top-16 bottom-0 left-20 hidden w-96 overflow-y-auto border-r border-gray-200 px-4 py-6 sm:px-6 lg:px-8 xl:block">
-          {/* Secondary column (hidden on smaller screens) */}
-        </aside>
       </div>
     </>
   );
 }
+
+const AddAssetModal = ({
+  tickerCode,
+  setTickerCode,
+  isCrypto,
+  setIsCrypto,
+}: {
+  tickerCode: string;
+  setTickerCode: (tickerCode: string) => void;
+  isCrypto: boolean;
+  setIsCrypto: (isCrypto: boolean) => void;
+}) => {
+  return (
+    <div className="flex flex-col">
+      <Input
+        label="Code"
+        placeholder={tickerCode}
+        type="text"
+        name="ticker_input"
+        id="ticker_input"
+        onChange={(e) => setTickerCode(e.target.value)}
+      />
+
+      <SwitchField className="flex flex-row justify-between">
+        <Label>Is this asset crypto?</Label>
+        <Switch
+          color="red"
+          name="is_crypto"
+          defaultChecked={isCrypto}
+          checked={isCrypto}
+          onChange={() => setIsCrypto(!isCrypto)}
+        />
+      </SwitchField>
+    </div>
+  );
+};
