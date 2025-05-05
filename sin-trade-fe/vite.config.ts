@@ -5,6 +5,7 @@
 /// <reference types="vitest" />
 import { defineConfig, loadEnv, UserConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
+import tailwindcss from "@tailwindcss/vite";
 
 // https://vitejs.dev/config/
 export default ({ mode }: { mode: string }): UserConfig => {
@@ -17,7 +18,8 @@ export default ({ mode }: { mode: string }): UserConfig => {
   const port = Number(process.env.PORT) || defaultPort;
 
   return defineConfig({
-    plugins: [react()],
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    plugins: [react(), tailwindcss()],
     build: {
       sourcemap: isDev,
       minify: !isDev,
@@ -37,8 +39,8 @@ export default ({ mode }: { mode: string }): UserConfig => {
       include: ["react", "react-dom"],
     },
     test: {
-      include: ['src/**/*.test.tsx', 'src/**/*.spec.tsx'],
-      environment: 'jsdom'
-    }
+      include: ["src/**/*.test.tsx", "src/**/*.spec.tsx"],
+      environment: "jsdom",
+    },
   });
 };
