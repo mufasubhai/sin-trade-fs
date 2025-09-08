@@ -4,6 +4,7 @@ from flask_cors import CORS
 import logging
 from src.routes.auth_routes import init_auth_routes
 from src.routes.test_routes import init_test_routes
+from src.routes.asset_routes import init_asset_routes
 
 # from models.user_model import db
 
@@ -19,6 +20,7 @@ def create_app():
         return jsonify({"status": "healthy"}), 200
 
     init_test_routes(app)
+    init_asset_routes(app)
     # add routes
     # The line `init_auth_routes(app)` is likely a function call that initializes the authentication
     # routes for the Flask application. This function is expected to be defined elsewhere in the

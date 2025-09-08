@@ -1,9 +1,6 @@
 // "use client";
 
-import {
-  Description,
-  Label,
-} from "../../components/catalyst_components/fieldset";
+import { Label } from "../../components/catalyst_components/fieldset";
 import {
   Switch,
   SwitchField,
@@ -40,6 +37,7 @@ import {
 } from "@heroicons/react/20/solid";
 import { useAuth } from "../../context/useAuth";
 import GenericModal from "../../components/GenericModal";
+import { addAsset } from "../../api/AddAsset";
 
 const navigation = [
   { name: "Dashboard", href: "#", icon: HomeIcon, current: true },
@@ -67,8 +65,11 @@ export default function Dashboard() {
 
   const [searchString, setSearchString] = useState("");
   const [addModalOpen, setAddModalOpen] = useState(false);
-  const [tickerCode, setTickerCode] = useState("");
+  const [assetTicker, setassetTicker] = useState("");
   const [isCrypto, setIsCrypto] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
   return (
     <>
@@ -215,17 +216,30 @@ export default function Dashboard() {
               title="Add Asset"
               child={
                 <AddAssetModal
-                  tickerCode={tickerCode}
-                  setTickerCode={setTickerCode}
+                  assetTicker={assetTicker}
+                  setassetTicker={setassetTicker}
                   isCrypto={isCrypto}
                   setIsCrypto={setIsCrypto}
                 />
               }
+              isLoading={isLoading}
+              isError={isError}
               icon={<PlusIcon />}
-              confirmFunction={() => {
-                console.log("hello!");
-              }}
-              confirmArgs={[]}
+              confirmFunction={() =>
+                addAsset({
+                  assetTicker,
+                  isCrypto,
+                  setIsLoading,
+                  setIsError,
+                  setIsSuccess,
+                  accessToken: user?.accessToken ?? "",
+                  refreshToken: user?.refreshToken ?? "",
+                  userId: user?.userId ?? 0,
+                })
+              }
+              // make these not mandatory
+              confirmText={"Add Asset"}
+              confirmDisabled={false}
             />
             <div className="px-4 py-10 sm:px-6 lg:px-8 lg:py-6">
               {Object.values(user?.activeAssets ?? {}).map((asset) => {
@@ -254,29 +268,29 @@ export default function Dashboard() {
 }
 
 const AddAssetModal = ({
-  tickerCode,
-  setTickerCode,
+  assetTicker,
+  setassetTicker,
   isCrypto,
   setIsCrypto,
 }: {
-  tickerCode: string;
-  setTickerCode: (tickerCode: string) => void;
+  assetTicker: string;
+  setassetTicker: (assetTicker: string) => void;
   isCrypto: boolean;
   setIsCrypto: (isCrypto: boolean) => void;
 }) => {
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col bg-slate-100 p-5 rounded-md">
       <Input
         label="Code"
-        placeholder={tickerCode}
+        placeholder={assetTicker}
         type="text"
         name="ticker_input"
         id="ticker_input"
-        onChange={(e) => setTickerCode(e.target.value)}
+        onChange={(e) => setassetTicker(e.target.value)}
       />
 
-      <SwitchField className="flex flex-row justify-between">
-        <Label>Is this asset crypto?</Label>
+      <SwitchField color="blue" className="flex p-2 justify-between">
+        <Label className="dark:text-red-500 ">Cryptocurrency?</Label>
         <Switch
           color="red"
           name="is_crypto"
@@ -288,3 +302,25 @@ const AddAssetModal = ({
     </div>
   );
 };
+
+// const addAssetModalFunc = async ([
+//   assetTicker,
+//   isCrypto,
+//   setIsLoading,
+//   setIsError,
+//   setIsSuccess,
+// ]: [
+//   assetTicker: string,
+//   isCrypto: boolean,
+//   setIsLoading: (isLoading: boolean) => void,
+//   setIsError: (isError: boolean) => void,
+//   setIsSuccess: (isSuccess: boolean) => void
+// ]) => {
+//   await addAsset({
+//     assetTicker,
+//     isCrypto,
+//     setIsLoading,
+//     setIsError,
+//     setIsSuccess,
+//   });
+// };

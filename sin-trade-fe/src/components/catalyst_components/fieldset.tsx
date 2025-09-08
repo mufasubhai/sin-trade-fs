@@ -73,15 +73,14 @@ export function Label({
   className,
   ...props
 }: { className?: string } & Omit<Headless.LabelProps, "as" | "className">) {
+  const newClassName = clsx(
+    // className,
+    className,
+    "text-base/6 text-zinc-950 select-none data-disabled:opacity-50 sm:text-sm/6 dark:text-orange-500"
+  );
+
   return (
-    <Headless.Label
-      data-slot="label"
-      {...props}
-      className={clsx(
-        className,
-        "text-base/6 text-zinc-950 select-none data-disabled:opacity-50 sm:text-sm/6 dark:text-white"
-      )}
-    />
+    <Headless.Label data-slot="label" {...props} className={newClassName} />
   );
 }
 

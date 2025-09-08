@@ -1,6 +1,6 @@
 # controllers/asset_controller.py
 from flask import Blueprint, request, jsonify
-from src.services.asset_services import assetService
+from src.services.asset_services import AssetService
 from werkzeug.exceptions import HTTPException
 
 asset_controller = Blueprint('asset_controller', __name__)
@@ -9,7 +9,7 @@ asset_controller = Blueprint('asset_controller', __name__)
 def add_asset():
     try:
         data = request.get_json()
-        response_data, status_code = assetService.addAsset(data)
+        response_data, status_code = AssetService.addAsset(data)
         
         return response_data, status_code
     except HTTPException as e:
@@ -21,7 +21,7 @@ def add_asset():
 def delete_asset():
     try: 
         data = request.get_json()
-        response_data, status_code = assetService.deleteAsset(data)
+        response_data, status_code = AssetService.deleteAsset(data)
         
         return response_data, status_code
     except HTTPException as e:
@@ -33,7 +33,7 @@ def delete_asset():
 def list_assets():
     try: 
         data = request.get_json()
-        response_data, status_code = assetService.listAssets(data)
+        response_data, status_code = AssetService.listAssets(data)
         return response_data, status_code
     
     except HTTPException as e:
