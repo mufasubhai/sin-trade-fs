@@ -10,6 +10,7 @@ export const addAsset = async ({
   userId,
   setIsSuccess,
   accessToken,
+  setAddModalOpen,
   refreshToken,
 }: {
   assetTicker: string;
@@ -21,6 +22,7 @@ export const addAsset = async ({
     refreshToken: string,
     accessToken: string
   ) => Promise<Response | undefined>;
+  setAddModalOpen: (addModalOpen: boolean) => void;
   isCrypto: boolean | null;
   userId: number | null;
   setIsLoading: (isLoading: boolean) => void;
@@ -61,8 +63,6 @@ export const addAsset = async ({
       await fetchAssets();
     }
 
-    console.log("DATA", data, "DATA");
-
     // we need to refreshe the data base don new data
     // we need to close the modal.
     // we should add proper error handling in case of failure.
@@ -83,6 +83,7 @@ export const addAsset = async ({
     setIsError(false);
     setIsSuccess(true);
     // loginUser(user);
+    setAddModalOpen(false);
 
     return "success";
 
@@ -92,6 +93,7 @@ export const addAsset = async ({
     // logoutUser();
     setIsLoading(false);
     setIsError(true);
+    setAddModalOpen(false);
     setIsSuccess(false);
   }
 };

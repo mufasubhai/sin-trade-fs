@@ -29,13 +29,14 @@ import {
   HomeIcon,
   UserCircleIcon,
   // UsersIcon,
-  // XMarkIcon,
+  XMarkIcon,
 } from "@heroicons/react/24/outline";
 import {
   ChevronDownIcon,
   MagnifyingGlassIcon,
 } from "@heroicons/react/20/solid";
 import { useAuth } from "../../context/useAuth";
+import { type AuthContextType } from "../../context/AuthContext";
 import GenericModal from "../../components/GenericModal";
 import { addAsset } from "../../api/AddAsset";
 
@@ -53,15 +54,19 @@ function classNames(...classes: string[]) {
 }
 
 export default function Dashboard() {
-  const { logoutUser } = useAuth();
+  const {
+    user,
+    fetchAssets,
+    addAssetToDB,
+    assets,
+    logoutUser,
+  }: AuthContextType = useAuth();
 
   const userNavigation = [
     // { name: "Your profile" },
     { name: "Sign out", function: () => logoutUser() },
   ];
   // const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  const { user, fetchAssets, addAssetToDB, assets } = useAuth();
 
   const [searchString, setSearchString] = useState("");
   const [addModalOpen, setAddModalOpen] = useState(false);
@@ -123,7 +128,6 @@ export default function Dashboard() {
                   aria-label="Search"
                   onChange={(e) => {
                     setSearchString(e.target.value);
-                    // console.log(e.target.value);
                   }}
                   className="col-start-1 row-start-1 block size-full bg-white pl-8 text-base text-gray-900 outline-hidden placeholder:text-gray-400 sm:text-sm/6"
                 />
@@ -211,6 +215,21 @@ export default function Dashboard() {
             </div>
 
             <GenericModal
+              open={isSuccess}
+              setOpen={setIsSuccess}
+              title="Asset Added"
+              child={<div>Asset Added</div>}
+              confirmFunction={() => {
+                setIsSuccess(false);
+              }}
+              confirmText="Close"
+              confirmDisabled={false}
+              isLoading={false}
+              isError={false}
+              icon={<XMarkIcon />}
+            />
+
+            <GenericModal
               open={addModalOpen}
               setOpen={setAddModalOpen}
               title="Add Asset"
@@ -226,6 +245,7 @@ export default function Dashboard() {
               isError={isError}
               icon={<PlusIcon />}
               confirmFunction={() =>
+                // maybe change the structure of this a bit.
                 addAsset({
                   assetTicker,
                   isCrypto,
@@ -233,6 +253,7 @@ export default function Dashboard() {
                   addAssetToDB,
                   setIsLoading,
                   setIsError,
+                  setAddModalOpen,
                   setIsSuccess,
                   accessToken: user?.accessToken ?? "",
                   refreshToken: user?.refreshToken ?? "",

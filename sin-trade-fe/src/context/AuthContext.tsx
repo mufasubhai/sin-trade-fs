@@ -5,7 +5,7 @@ import { ListAssetResponseSchema } from "../interfaces/ListAssetResponse";
 
 // what is missing is a function to disable tokens after a certain amount of time.
 // we should save the date of creation of the tokens and disable them after a certain amount of time.
-interface AuthContextType {
+export interface AuthContextType {
   accessToken: string | null;
   refreshToken: string | null;
   tokenCreationDate: Date | null;
@@ -83,16 +83,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // looks like everything is good here, but for some reason the setAssets is not updating the state/UI.
       // confirm shape coming back is good. and that we are handling the update function correctly.
       if (listAssetResponse.status === 200) {
-        const newAssets = listAssetResponse.data.reduce((acc, asset) => {
-          acc[asset.tickerName] = asset;
-          return acc;
-        }, {} as Record<string, Asset>);
-
-        console.log("NEW ASSETS", newAssets, "NEW ASSETS");
+        const newAssets: Record<string, Asset> = Object.fromEntries(
+          (listAssetResponse.data as Asset[]).map((asset) => [
+            asset.tickerName,
+            asset,
+          ])
+        );
 
         setAssets(newAssets);
       }
-      console.log("RESPONSE", response, "RESPONSE");
+
       // here we need ot set the assets.
     } catch (error) {
       console.error("Error fetching assets", error);

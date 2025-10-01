@@ -25,8 +25,6 @@ export default function Login() {
   } = useUI();
 
   const handleLogin = () => {
-    // console.log("handleLogin");
-    // console.log(email, password, setIsLoading, loginUser, logoutUser, setIsError, setIsSuccess);
     void login({
       email: email,
       password: password,
