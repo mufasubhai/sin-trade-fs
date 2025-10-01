@@ -30,10 +30,11 @@ def delete_asset():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
     
-def list_assets():
+    
+@asset_controller.route('/assets/<user_id>', methods=['GET'])
+def list_assets(user_id):
     try: 
-        data = request.get_json()
-        response_data, status_code = AssetService.listAssets(data)
+        response_data, status_code = AssetService.getActiveAssetsByUserId(user_id)
         return response_data, status_code
     
     except HTTPException as e:

@@ -61,7 +61,7 @@ export default function Dashboard() {
   ];
   // const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const { user } = useAuth();
+  const { user, fetchAssets, addAssetToDB, assets } = useAuth();
 
   const [searchString, setSearchString] = useState("");
   const [addModalOpen, setAddModalOpen] = useState(false);
@@ -215,7 +215,7 @@ export default function Dashboard() {
               setOpen={setAddModalOpen}
               title="Add Asset"
               child={
-                <AddAssetModal
+                <AddAssetModalBody
                   assetTicker={assetTicker}
                   setassetTicker={setassetTicker}
                   isCrypto={isCrypto}
@@ -229,12 +229,14 @@ export default function Dashboard() {
                 addAsset({
                   assetTicker,
                   isCrypto,
+                  fetchAssets,
+                  addAssetToDB,
                   setIsLoading,
                   setIsError,
                   setIsSuccess,
                   accessToken: user?.accessToken ?? "",
                   refreshToken: user?.refreshToken ?? "",
-                  userId: user?.userId ?? 0,
+                  userId: user?.userId ?? null,
                 })
               }
               // make these not mandatory
@@ -242,7 +244,7 @@ export default function Dashboard() {
               confirmDisabled={false}
             />
             <div className="px-4 py-10 sm:px-6 lg:px-8 lg:py-6">
-              {Object.values(user?.activeAssets ?? {}).map((asset) => {
+              {Object.values(assets ?? {}).map((asset) => {
                 if (
                   searchString &&
                   !asset.tickerName
@@ -267,7 +269,7 @@ export default function Dashboard() {
   );
 }
 
-const AddAssetModal = ({
+const AddAssetModalBody = ({
   assetTicker,
   setassetTicker,
   isCrypto,

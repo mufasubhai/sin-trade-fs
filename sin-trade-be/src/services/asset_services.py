@@ -52,10 +52,9 @@ class AssetService:
                             try: 
                                 BackendConfig.supabase.table("user_assets").insert(
                                     {
-                                        "ticker_name": data["ticker_code"],
-                                        "user_id": data["user_id"].to_Int(),
-                                        "asset_id": asset_id
-                                        
+                                        "ticker_name" : data["ticker_code"],
+                                        "user_id" : data["user_id"],
+                                        "asset_id" : asset_id,
                                     }
                                 ).execute()
                             except Exception as e:
@@ -63,11 +62,24 @@ class AssetService:
                     else: 
                         return {"message": "User assets not found"}, 500
         
-                return {"message": "Asset added successfully"}, 200
+                return {
+                        "message": "Asset added successfully",
+                        "status": 200
+                        }, 200
             return {"message": "Database connection unsuccessful"}, 500
         except Exception as e:
             return {"message": str(e)}, 401
     
+    
+    @staticmethod
+    def getActiveAssetsByUserId(user_id):
+        try:
+            if BackendConfig.supabase:
+                response = BackendConfig.supabase.table("user_assets").select("*").eq("user_id", user_id).execute()
+                return {"data": response.data,"message": "Assets fetched successfully", "status": 200}, 200
+            return {"message": "Database connection unsuccessful"}, 500
+        except Exception as e:
+            return {"message": str(e)}, 401
     # @staticmethod
     # def deleteAsset(data):
     
