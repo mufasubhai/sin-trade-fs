@@ -22,6 +22,7 @@ import {
   // Bars3Icon,
   BellIcon,
   CalendarIcon,
+  TrashIcon,
   ChartPieIcon,
   // DocumentDuplic/ateIcon,
   // FolderIcon,
@@ -39,6 +40,8 @@ import { useAuth } from "../../context/useAuth";
 import { type AuthContextType } from "../../context/AuthContext";
 import GenericModal from "../../components/GenericModal";
 import { addAsset } from "../../api/AddAsset";
+import { Asset } from "../../interfaces/UserInterface";
+import { deleteAsset } from "../../api/DeleteAsset";
 
 const navigation = [
   { name: "Dashboard", href: "#", icon: HomeIcon, current: true },
@@ -60,6 +63,7 @@ export default function Dashboard() {
     addAssetToDB,
     assets,
     logoutUser,
+    deleteAssetFromDB,
   }: AuthContextType = useAuth();
 
   const userNavigation = [
@@ -70,6 +74,11 @@ export default function Dashboard() {
 
   const [searchString, setSearchString] = useState("");
   const [addModalOpen, setAddModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [deleteSuccess, setDeleteSuccess] = useState(false);
+  const [deleteError, setDeleteError] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [assetToDelete, setAssetToDelete] = useState<Asset | null>(null);
   const [assetTicker, setassetTicker] = useState("");
   const [isCrypto, setIsCrypto] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
@@ -215,12 +224,50 @@ export default function Dashboard() {
             </div>
 
             <GenericModal
+              open={deleteModalOpen}
+              setOpen={setDeleteModalOpen}
+              title="Delete Asset"
+              child={<DeleteAssetModalBody assetToDelete={assetToDelete} />}
+              confirmFunction={() =>
+                deleteAsset({
+                  assetId: assetToDelete?.assetId ?? 0,
+                  userId: user?.userId ?? 0,
+                  deleteAssetFromDB,
+                  fetchAssets,
+                  setDeleteError,
+                  setDeleteSuccess,
+                  setDeleteModalOpen,
+                  setDeleteLoading,
+                })
+              }
+              confirmText="Delete Asset"
+              confirmDisabled={false}
+              isLoading={deleteLoading}
+              isError={deleteError}
+              icon={<XMarkIcon />}
+            />
+
+            <GenericModal
               open={isSuccess}
               setOpen={setIsSuccess}
               title="Asset Added"
               child={<div>Asset Added</div>}
               confirmFunction={() => {
                 setIsSuccess(false);
+              }}
+              confirmText="Close"
+              confirmDisabled={false}
+              isLoading={false}
+              isError={false}
+              icon={<XMarkIcon />}
+            />
+            <GenericModal
+              open={deleteSuccess}
+              setOpen={setDeleteSuccess}
+              title="Asset Deleted"
+              child={<div>Asset Deleted</div>}
+              confirmFunction={() => {
+                setDeleteSuccess(false);
               }}
               confirmText="Close"
               confirmDisabled={false}
@@ -256,7 +303,7 @@ export default function Dashboard() {
                   setAddModalOpen,
                   setIsSuccess,
                   accessToken: user?.accessToken ?? "",
-                  refreshToken: user?.refreshToken ?? "",
+                  // refreshToken: user?.refreshToken ?? "",
                   userId: user?.userId ?? null,
                 })
               }
@@ -277,8 +324,19 @@ export default function Dashboard() {
                 // need to add some additional styling to the asset. This should end up being a column thathas the ticker name, last updated, and a button to remove the asset.
                 // we also need to add an updated value to the object in the DB.
                 return (
-                  <div key={asset.assetId}>
+                  <div
+                    key={asset.assetId}
+                    className="flex flex-row justify-between w-40"
+                  >
                     <h1>{asset.tickerName}</h1>
+                    <button
+                      onClick={() => {
+                        setDeleteModalOpen(true);
+                        setAssetToDelete(asset);
+                      }}
+                    >
+                      <TrashIcon className="size-6" />
+                    </button>
                   </div>
                 );
               })}
@@ -289,6 +347,14 @@ export default function Dashboard() {
     </>
   );
 }
+
+const DeleteAssetModalBody = ({
+  assetToDelete,
+}: {
+  assetToDelete: Asset | null;
+}) => {
+  return <div>Delete Asset {assetToDelete?.tickerName} ?</div>;
+};
 
 const AddAssetModalBody = ({
   assetTicker,
@@ -325,25 +391,3 @@ const AddAssetModalBody = ({
     </div>
   );
 };
-
-// const addAssetModalFunc = async ([
-//   assetTicker,
-//   isCrypto,
-//   setIsLoading,
-//   setIsError,
-//   setIsSuccess,
-// ]: [
-//   assetTicker: string,
-//   isCrypto: boolean,
-//   setIsLoading: (isLoading: boolean) => void,
-//   setIsError: (isError: boolean) => void,
-//   setIsSuccess: (isSuccess: boolean) => void
-// ]) => {
-//   await addAsset({
-//     assetTicker,
-//     isCrypto,
-//     setIsLoading,
-//     setIsError,
-//     setIsSuccess,
-//   });
-// };

@@ -80,8 +80,18 @@ class AssetService:
             return {"message": "Database connection unsuccessful"}, 500
         except Exception as e:
             return {"message": str(e)}, 401
+
+
+
     # @staticmethod
-    # def deleteAsset(data):
+    def deleteUserAsset(asset_id, user_id):
+        try:
+            if BackendConfig.supabase:
+                response = BackendConfig.supabase.table("user_assets").delete().eq("asset_id", asset_id).eq("user_id", user_id).execute()
+                return {"message": "Asset deleted successfully", "status": 200, "data": {"asset_id": asset_id, "user_id": user_id},}, 200
+            return {"message": "Database connection unsuccessful", "status": 500}, 500
+        except Exception as e:
+            return {"message": str(e), "status": 500}, 500
     
     # @staticmethod   
     # def listAssets(data)
