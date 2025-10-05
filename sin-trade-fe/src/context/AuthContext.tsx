@@ -6,8 +6,13 @@ import { ListAssetResponseSchema } from "../interfaces/ListAssetResponse";
 // what is missing is a function to disable tokens after a certain amount of time.
 // we should save the date of creation of the tokens and disable them after a certain amount of time.
 export interface AuthContextType {
+  deleteAssetFromDB: (
+    assetId: number,
+    userId: number
+  ) => Promise<Response | undefined>;
   accessToken: string | null;
   refreshToken: string | null;
+
   tokenCreationDate: Date | null;
   user: UserResponse | null;
   assets: Record<string, Asset>;
@@ -16,7 +21,7 @@ export interface AuthContextType {
     assetTicker: string,
     userId: number,
     isCrypto: boolean,
-    refreshToken: string,
+    // refreshToken: string,
     accessToken: string
   ) => Promise<Response | undefined>;
   setAssets: (assets: Record<string, Asset>) => void; // Repla
@@ -67,12 +72,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [refreshToken, setRefreshToken] = useState<string | null>(null);
   const [user, setUser] = useState<UserResponse | null>(null);
 
+  const deleteAssetFromDB = async (assetId: number, userId: number) => {
+    try {
+      const response = await fetch(
+        `${dataUrl}assets/asset/${assetId}/${userId}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      if (!response.ok || response.status !== 200) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response;
+    } catch (error) {
+      console.error("Error deleting asset", error);
+    }
+  };
   const fetchAssets = async () => {
     if (!user) return;
     try {
       const response = await fetch(`${dataUrl}assets/assets/${user.userId}`, {
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
         },
         method: "GET",
       });
@@ -109,21 +135,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     assetTicker: string,
     userId: number,
     isCrypto: boolean,
-    refreshToken: string,
+    // refreshToken: string,
     accessToken: string
   ) => {
     try {
-      const response = await fetch(`${dataUrl}assets/asset`, {
+      const response = await fetch(`${dataUrl}assets/add_asset`, {
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
         },
         method: "POST",
         body: JSON.stringify({
           ticker_code: assetTicker,
           user_id: userId,
           is_crypto: isCrypto,
-          refresh_token: refreshToken,
-          access_token: accessToken,
+          // refresh_token: refreshToken,
+          // access_token: accessToken,
         }),
       });
       return response;
@@ -165,6 +192,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         accessToken,
         addAssetToDB,
         assets,
+        deleteAssetFromDB,
         setAssets,
         refreshToken,
         user,

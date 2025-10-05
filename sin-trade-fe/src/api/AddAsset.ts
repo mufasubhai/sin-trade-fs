@@ -1,4 +1,4 @@
-import { AddAssetResponseSchema } from "../interfaces/AddAssetResponse";
+import { StandardResponseSchema } from "../interfaces/StandardResponse";
 
 export const addAsset = async ({
   assetTicker,
@@ -11,15 +11,15 @@ export const addAsset = async ({
   setIsSuccess,
   accessToken,
   setAddModalOpen,
-  refreshToken,
-}: {
+}: // refreshToken,
+{
   assetTicker: string;
   fetchAssets: () => Promise<void>;
   addAssetToDB: (
     assetTicker: string,
     userId: number,
     isCrypto: boolean,
-    refreshToken: string,
+    // refreshToken: string,
     accessToken: string
   ) => Promise<Response | undefined>;
   setAddModalOpen: (addModalOpen: boolean) => void;
@@ -29,7 +29,7 @@ export const addAsset = async ({
   setIsError: (isError: boolean) => void;
   setIsSuccess: (isSuccess: boolean) => void;
   accessToken: string;
-  refreshToken: string;
+  // refreshToken: string;
 }) => {
   setIsLoading(true);
   try {
@@ -39,7 +39,7 @@ export const addAsset = async ({
       assetTicker,
       userId ?? 0,
       isCrypto ?? false,
-      refreshToken,
+      // refreshToken,
       accessToken
     );
 
@@ -57,7 +57,7 @@ export const addAsset = async ({
 
     const data = (await response.json()) as object;
 
-    const addAssetResponse = AddAssetResponseSchema.parse(data);
+    const addAssetResponse = StandardResponseSchema.parse(data);
 
     if (addAssetResponse.status === 200) {
       await fetchAssets();

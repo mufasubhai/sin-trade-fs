@@ -19,10 +19,12 @@ export const login = async ({
   setIsSuccess: (isSuccess: boolean) => void;
 }) => {
   setIsLoading(true);
+  // const accessToken = localStorage.getItem("access_token");
   try {
     const response = await fetch(`${dataUrl}auth/login`, {
       headers: {
         "Content-Type": "application/json",
+        // Authorization: `Bearer ${accessToken}`,
       },
       method: "POST",
       body: JSON.stringify({ email, password }),
