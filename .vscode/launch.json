@@ -104,6 +104,13 @@
         "sin-trade-fe-server",
         "sin-trade-fe"
       ]
+    },
+    {
+      "name": "Run Frontend",
+      "configurations": [
+        "sin-trade-fe-server",
+        "sin-trade-fe"
+      ]
     }
   ]
 }
