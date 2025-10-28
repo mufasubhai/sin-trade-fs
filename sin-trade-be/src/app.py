@@ -7,7 +7,7 @@ from src.routes.test_routes import init_test_routes
 from src.routes.asset_routes import init_asset_routes
 
 from src.services.be_job_scheduler import tick
-from apscheduler.schedulers.blocking import BlockingScheduler
+from apscheduler.schedulers.background  import BackgroundScheduler
 from src.services.amqp_be_subscriber import subscribe_to_queues
 from src.services.amqp_be_publisher import declare_queues
 
@@ -39,7 +39,7 @@ app = create_app()
 # let's think about timing here.
 if __name__ == "src.app":
     try:
-        scheduler = BlockingScheduler()
+        scheduler = BackgroundScheduler()
         scheduler.add_executor("processpool")
         scheduler.add_job(tick, "interval", seconds=20)
         declare_queues()
@@ -51,16 +51,16 @@ if __name__ == "src.app":
         print("Scheduler stopped by user")
         pass
 
-if __name__ == "__main__":
-    try:
-        scheduler = BlockingScheduler()
-        scheduler.add_executor("processpool")
-        scheduler.add_job(tick, "interval", seconds=20)
-        declare_queues()
-        subscribe_to_queues()
-        scheduler.start()
-    except Exception as e:
-        print(f"Failed to start scheduler: {e}")
-    except (KeyboardInterrupt, SystemExit):
-        print("Scheduler stopped by user")
-        pass
+# if __name__ == "__main__":
+#     try:
+#         scheduler = BackgroundScheduler()
+#         scheduler.add_executor("processpool")
+#         scheduler.add_job(tick, "interval", seconds=20)
+#         declare_queues()
+#         subscribe_to_queues()
+#         scheduler.start()
+#     except Exception as e:
+#         print(f"Failed to start scheduler: {e}")
+#     except (KeyboardInterrupt, SystemExit):
+#         print("Scheduler stopped by user")
+#         pass

@@ -2,7 +2,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "sin-trade-be",
+            "name": "sin-trade-ds",
             "type": "debugpy",
             "request": "launch",
             "module": "flask",
@@ -16,7 +16,7 @@
                 "run",
                 "--no-debugger",
                 "--no-reload",
-                "--port=5002"
+                "--port=5004"
             ],
             "jinja": true,
             "justMyCode": true,
