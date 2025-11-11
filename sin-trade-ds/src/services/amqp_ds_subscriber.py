@@ -5,12 +5,15 @@ import logging
 # importing the config with easy access to env variables.
 from src.config import DSConfig
 
+def stock_callback(ch, method, properties, body):
+    print(f"Received stock message: {body}")
 
-def callback(ch, method, properties, body):
-    print(f"Received message: {body}")
+def crypto_callback(ch, method, properties, body):
+    ## need to addd logic to process the crypto message
+    print(f"Received crypto message: {body}")
 
 
-def _consume_queue(queue_name):
+def _consume_queue(queue_name, callback):
     f"""Consume messages from a {queue_name} in a separate thread"""
     connection = DSConfig.get_connection()
     if not connection:
@@ -33,21 +36,19 @@ def _consume_queue(queue_name):
             connection.close()
 
 
+
 def subscribe_to_queues():
     """Start consuming from queues in background threads"""
     # Subscribe to queues from BE service
     crypto_thread = threading.Thread(
-        target=_consume_queue, args=("crypto_queue",), daemon=True
+        target=_consume_queue, args=("crypto_queue", crypto_callback), daemon=True
     )
+    
     stock_thread = threading.Thread(
-        target=_consume_queue, args=("stock_queue",), daemon=True
-    )
-    refresh_thread = threading.Thread(
-        target=_consume_queue, args=("refresh_queue",), daemon=True
+        target=_consume_queue, args=("stock_queue", stock_callback), daemon=True
     )
 
     crypto_thread.start()
     stock_thread.start()
-    refresh_thread.start()
 
     print("Started AMQP DS subscriber threads")
