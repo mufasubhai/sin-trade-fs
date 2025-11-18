@@ -1,6 +1,7 @@
-import pika, os
+# import pika, os
+import asyncio
 import threading
-import logging
+from src.services.alphavantage_services import fetch_history_for_asset
 
 # importing the config with easy access to env variables.
 from src.config import DSConfig
@@ -11,6 +12,24 @@ def stock_callback(ch, method, properties, body):
 def crypto_callback(ch, method, properties, body):
     ## need to addd logic to process the crypto message
     print(f"Received crypto message: {body}")
+    
+    async def process_message():
+        try:
+            await fetch_history_for_asset(body.decode(), True)
+        except Exception as e:
+            print(f"Error processing crypto message {body}: {e}")
+            ## schedule for retry here. 
+             # Run the async code in the event loop
+    try:
+        loop = asyncio.get_event_loop()
+        if loop.is_running():
+            # If loop is already running, use run_coroutine_threadsafe
+            asyncio.run_coroutine_threadsafe(process_message(), loop)
+        else:
+            loop.run_until_complete(process_message())
+    except RuntimeError:
+        # No event loop, create a new one
+        asyncio.run(process_message())
 
 
 def _consume_queue(queue_name, callback):

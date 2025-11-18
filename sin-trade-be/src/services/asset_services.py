@@ -18,7 +18,7 @@ class AssetService:
                     return {"message": "Only crypto assets are supported at the moment"}, 400
                 
                 # verify if asset exists in from_to_alpha for initial ffor initial fetching
-                if data['ticker_code'] not in fromToAlpha:
+                if data['ticker_code'].upper() not in fromToAlpha:
                     return {"message": "Asset not supported"}, 400
                 
                 # check to see if we have a record of this asset in active_assets
