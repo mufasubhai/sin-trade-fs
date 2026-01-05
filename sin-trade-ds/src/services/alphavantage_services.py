@@ -71,7 +71,7 @@ async def write_history_to_db(ticker_code: str, history_data: dict, is_crypto: b
             
             
 
-        batch_size = 1000
+        batch_size = 500
         for i in range(0, len(record_list), batch_size):
             batch = record_list[i:i + batch_size]
             try:
