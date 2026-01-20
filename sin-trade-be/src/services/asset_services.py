@@ -110,7 +110,7 @@ class AssetService:
             return {"message": str(e)}, 401
 
 
-c
+
     # @staticmethod
     def deleteUserAsset(asset_id, user_id):
         try:
