@@ -15,7 +15,7 @@ class AuthService:
                     'email': data['email'],
                     'password': data['password']
                 })
-                
+                    
                 #  We need  to add some tests for this. 
                 
                 

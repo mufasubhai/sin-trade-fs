@@ -1,14 +1,19 @@
+
+- AI related citations and references located in CITATIONS.md
+
+ - Auto generated CLAUDE.md file present as well
+
 For best results to set up the project, I recommend installing 
-homebrew (if on mac)
+homebrew (if on mac or linux)
 once you've installed homebrew, asdf for versions
 asdf plugin add nodejs
 asdf plugin add python
 asdf install python 3.12.4
-asdf global python 3.12.4
+asdf set -u python 3.12.4
 asdf install nodejs 22.1.0
-asdf global nodejs 22.1.0
+asdf set -u nodejs 22.1.0
 brew install pnpm
-cd sin-trade-fe
+cd sin-trade-fe 
 pnpm install
 
 create virtual environments. Important for launch.json
