@@ -19,6 +19,7 @@ class AssetService:
                 
                 # verify if asset exists in from_to_alpha for initial ffor initial fetching
                 if data['ticker_code'].upper() not in fromToAlpha:
+                    ## need to add support for crypto assets here// also need to follow path to render FE error
                     return {"message": "Asset not supported"}, 400
                 
                 # check to see if we have a record of this asset in active_assets

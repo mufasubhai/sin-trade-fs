@@ -1,3 +1,6 @@
+## We may need to make a map for crypto asserts for alpha vs kraken.
+
+
 fromToAlpha = {
     "00": {
         "USD"

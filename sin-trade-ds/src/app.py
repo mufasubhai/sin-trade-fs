@@ -3,6 +3,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 
 from src.routes.test_routes import init_test_routes
+from apscheduler.schedulers.background  import BackgroundScheduler
 
 from src.services.ds_job_scheduler import  check_targets
 from src.services.amqp_ds_subscriber import subscribe_to_queues

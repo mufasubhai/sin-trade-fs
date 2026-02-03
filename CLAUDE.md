@@ -203,3 +203,4 @@ subscribe_to_queues()  # Starts background threads
 
 `docker-compose.yml` defines all three services with health checks at `/health` endpoints.
 Individual Dockerfiles in each service directory.
+`

@@ -38,6 +38,9 @@ async def write_history_to_db(ticker_code: str, history_data: dict, is_crypto: b
     
     if is_crypto:
         name = history_data.get('Meta Data', {}).get('3. Digital Currency Name', None)
+        
+        if (name == "BTC"):
+            name = "XBTC"
         market = history_data.get('Meta Data', {}).get('4. Market Code', 'USD')
         market_name = history_data.get('Meta Data', {}).get('4. Market Name', 'Dollar')
         history = history_data.get('Time Series (Digital Currency Daily)', {})
