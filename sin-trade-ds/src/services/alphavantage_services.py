@@ -63,6 +63,7 @@ async def write_history_to_db(ticker_code: str, history_data: dict, is_crypto: b
                 "current_price": record['4. close'],
                 "daily_close": record['4. close'],
                 "daily_volume": record['5. volume'],
+<<<<<<< Updated upstream
                 # "market_cap": record['6. market cap (USD)'],
                 # "open": record['1a. open (USD)'],
                 # "high": record['2a. high (USD)'],
@@ -70,6 +71,8 @@ async def write_history_to_db(ticker_code: str, history_data: dict, is_crypto: b
                 # "close": record['4a. close (USD)'],
                 # "volume": record['5. volume'],
                 # "market_cap": record['6. market cap (USD)'],
+=======
+>>>>>>> Stashed changes
             })
             
             
