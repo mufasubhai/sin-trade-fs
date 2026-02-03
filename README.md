@@ -1,3 +1,8 @@
+
+- AI related citations and references located in CITATIONS.md
+
+ - Auto generated CLAUDE.md file present as well
+
 For best results to set up the project, I recommend installing 
 homebrew (if on mac or linux)
 once you've installed homebrew, asdf for versions
