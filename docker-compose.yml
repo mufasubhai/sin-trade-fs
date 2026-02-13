@@ -1,10 +1,10 @@
-version: '3.8'
-
 services:
   frontend:
     build:
       context: ./sin-trade-fe
       dockerfile: Dockerfile
+      args:
+        - VITE_BACKEND_URL=${VITE_BACKEND_URL:-http://localhost:5002/}
     ports:
       - "5173:5173"
     environment:
@@ -20,6 +20,10 @@ services:
     environment:
       - FLASK_ENV=production
       - PORT=5002  # Example environment variable
+      - SUPABASE_URL=${SUPABASE_URL:-https://vqadkcjfpucpgucxesvp.supabase.co}
+      - SUPABASE_KEY=${SUPABASE_KEY:-your-supabase-key}
+      - CLOUDAMQP_URL=${CLOUDAMQP_URL:-your-cloudamqp-url}
+      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:5173}
 
   ds:
     build:
@@ -30,3 +34,48 @@ services:
     environment:
       - FLASK_ENV=production
       - PORT=5004  # Example environment variable
+      - SUPABASE_URL=${SUPABASE_URL:-https://vqadkcjfpucpgucxesvp.supabase.co}
+      - SUPABASE_KEY=${SUPABASE_KEY:-your-supabase-key}
+      - ALPHAVANTAGE_KEY=${ALPHAVANTAGE_KEY:-your-alphavantage-key}
+      - POLYGON_KEY=${POLYGON_KEY:-your-polygon-key}
+      - CLOUDAMQP_URL=${CLOUDAMQP_URL:-your-cloudamqp-url}
+      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:5173}
+
+  prometheus:
+    build:
+      context: ./monitoring/prometheus
+      dockerfile: Dockerfile
+    ports:
+      - "9090:9090"
+    environment:
+      - SIN_TRADE_BE_HOST=${SIN_TRADE_BE_HOST:-backend:5002}
+      - SIN_TRADE_DS_HOST=${SIN_TRADE_DS_HOST:-ds:5004}
+      - SCRAPE_SCHEME=${SCRAPE_SCHEME:-https}
+    
+    volumes:
+      - prometheus-data:/prometheus
+    depends_on:
+      - backend
+      - ds
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GF_ADMIN_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GF_ADMIN_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - PROMETHEUS_URL=${PROMETHEUS_URL:-http://prometheus:9090}
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+
+volumes:
+  prometheus-data:
+  grafana-data:

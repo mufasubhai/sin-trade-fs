@@ -18,6 +18,8 @@ jobs:
           - 5173:5173
           - 5002:5002
           - 5004:5004
+          - 9090:9090
+          - 3000:3000
 
     steps:
       - name: Checkout code
@@ -42,6 +44,13 @@ jobs:
 
       - name: Build data science Docker image
         run: docker build --build-arg SUPABASE_URL=${{ secrets.SUPABASE_URL }} --build-arg SUPABASE_KEY=${{ secrets.SUPABASE_KEY }} -t sin-trade-ds:latest --build-arg PORT=5004 ./sin-trade-ds
+
+
+      - name: Build Prometheus Docker image
+        run: docker build -t sin-trade-prometheus:latest -f ./prometheus/Dockerfile ./prometheus
+
+      - name: Build Grafana Docker image 
+        run: docker build -t sin-trade-grafana:latest -f ./grafana/Dockerfile ./grafana
 
       - name: Run frontend container
         run: docker run -d --name sin-trade-fe -p 5173:5173 -e VITE_BACKEND_URL=${{ secrets.VITE_BACKEND_URL }} sin-trade-fe:latest
@@ -167,3 +176,24 @@ jobs:
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         run: heroku container:release web --app sin-trade-ds
+
+      - name: Build and push Prometheus Docker image to Heroku
+        run: |
+          docker build -t registry.heroku.com/sin-trade-prometheus/web -f ./prometheus/Dockerfile ./prometheus
+          docker push registry.heroku.com/sin-trade-prometheus/web
+
+      - name: Release Prometheus app
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+        run: heroku container:release web --app sin-trade-prometheus
+
+      - name: Build and push Grafana Docker image to Heroku
+        run: |
+          docker build -t registry.heroku.com/sin-trade-grafana/web -f ./grafana/Dockerfile ./grafana
+          docker push registry.heroku.com/sin-trade-grafana/web
+
+      - name: Release Grafana app
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+        run: heroku container:release web --app sin-trade-grafana
+        

@@ -1,0 +1,28 @@
+global:
+  scrape_interval: 2m
+  evaluation_interval: 2m
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'sin-trade-be'
+    metrics_path: /health
+    scheme: ${SCRAPE_SCHEME}
+    static_configs:
+      - targets: ['${SIN_TRADE_BE_HOST}']
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: 'sin-trade-be'
+
+  - job_name: 'sin-trade-ds'
+    metrics_path: /health
+    scheme: ${SCRAPE_SCHEME}
+    static_configs:
+      - targets: ['${SIN_TRADE_DS_HOST}']
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: 'sin-trade-ds'

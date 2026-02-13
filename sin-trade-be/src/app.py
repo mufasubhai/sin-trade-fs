@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Response
 from flask_cors import CORS
 from src.routes.auth_routes import init_auth_routes
 from src.routes.test_routes import init_test_routes
@@ -17,10 +17,14 @@ def create_app():
 
     print(app.config)
 
-    # Docker container health check
+    # Docker container health check (Prometheus-compatible)
     @app.route("/health")
     def health_check():
-        return jsonify({"status": "healthy"}), 200
+        metrics = """# HELP up Service health status
+# TYPE up gauge
+up 1
+"""
+        return Response(metrics, mimetype="text/plain")
 
     init_test_routes(app)
     init_asset_routes(app)
