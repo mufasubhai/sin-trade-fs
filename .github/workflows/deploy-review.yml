@@ -47,10 +47,10 @@ jobs:
 
 
       - name: Build Prometheus Docker image
-        run: docker build -t sin-trade-prometheus:latest -f ./prometheus/Dockerfile ./prometheus
+        run: docker build -t sin-trade-prometheus:latest -f ./monitoring/prometheus/Dockerfile ./monitoring/prometheus
 
       - name: Build Grafana Docker image 
-        run: docker build -t sin-trade-grafana:latest -f ./grafana/Dockerfile ./grafana
+        run: docker build -t sin-trade-grafana:latest -f ./monitoring/grafana/Dockerfile ./monitoring/grafana
 
       - name: Run frontend container
         run: docker run -d --name sin-trade-fe -p 5173:5173 -e VITE_BACKEND_URL=${{ secrets.VITE_BACKEND_URL }} sin-trade-fe:latest
