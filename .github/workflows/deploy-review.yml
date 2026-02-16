@@ -143,6 +143,8 @@ jobs:
       - name: Build and push frontend Docker image to Heroku
         run: |
           docker build \
+            --platform linux/amd64 \
+            --provenance=false \
             --build-arg VITE_BACKEND_URL=${{ secrets.VITE_BACKEND_URL }} \
             --build-arg PORT=5173 \
             -t registry.heroku.com/sin-trade-fe/web ./sin-trade-fe
@@ -156,6 +158,8 @@ jobs:
       - name: Build and push backend Docker image to Heroku
         run: |
           docker build \
+            --platform linux/amd64 \
+            --provenance=false \
             --build-arg PORT=5002 \
             -t registry.heroku.com/sin-trade-be/web ./sin-trade-be
           docker push registry.heroku.com/sin-trade-be/web
@@ -168,6 +172,8 @@ jobs:
       - name: Build and push data science Docker image to Heroku
         run: |
           docker build \
+            --platform linux/amd64 \
+            --provenance=false \
             --build-arg PORT=5004 \
             -t registry.heroku.com/sin-trade-ds/web ./sin-trade-ds
           docker push registry.heroku.com/sin-trade-ds/web
@@ -179,7 +185,10 @@ jobs:
 
       - name: Build and push Prometheus Docker image to Heroku
         run: |
-          docker build -t registry.heroku.com/sin-trade-prometheus/web ./monitoring/prometheus
+          docker build \
+            --platform linux/amd64 \
+            --provenance=false \
+            -t registry.heroku.com/sin-trade-prometheus/web ./monitoring/prometheus
           docker push registry.heroku.com/sin-trade-prometheus/web
 
       - name: Release Prometheus app
@@ -189,7 +198,10 @@ jobs:
 
       - name: Build and push Grafana Docker image to Heroku
         run: |
-          docker build -t registry.heroku.com/sin-trade-grafana/web ./monitoring/grafana
+          docker build \
+            --platform linux/amd64 \
+            --provenance=false \
+            -t registry.heroku.com/sin-trade-grafana/web ./monitoring/grafana
           docker push registry.heroku.com/sin-trade-grafana/web
 
       - name: Release Grafana app
