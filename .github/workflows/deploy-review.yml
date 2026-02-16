@@ -47,10 +47,10 @@ jobs:
 
 
       - name: Build Prometheus Docker image
-        run: docker build -t sin-trade-prometheus:latest -f ./monitoring/prometheus/Dockerfile ./monitoring/prometheus
+        run: docker build -t sin-trade-prometheus:latest ./monitoring/prometheus
 
-      - name: Build Grafana Docker image 
-        run: docker build -t sin-trade-grafana:latest -f ./monitoring/grafana/Dockerfile ./monitoring/grafana
+      - name: Build Grafana Docker image
+        run: docker build -t sin-trade-grafana:latest ./monitoring/grafana
 
       - name: Run frontend container
         run: docker run -d --name sin-trade-fe -p 5173:5173 -e VITE_BACKEND_URL=${{ secrets.VITE_BACKEND_URL }} sin-trade-fe:latest
@@ -179,7 +179,7 @@ jobs:
 
       - name: Build and push Prometheus Docker image to Heroku
         run: |
-          docker build -t registry.heroku.com/sin-trade-prometheus/web -f ./prometheus/Dockerfile ./prometheus
+          docker build -t registry.heroku.com/sin-trade-prometheus/web ./monitoring/prometheus
           docker push registry.heroku.com/sin-trade-prometheus/web
 
       - name: Release Prometheus app
@@ -189,7 +189,7 @@ jobs:
 
       - name: Build and push Grafana Docker image to Heroku
         run: |
-          docker build -t registry.heroku.com/sin-trade-grafana/web -f ./grafana/Dockerfile ./grafana
+          docker build -t registry.heroku.com/sin-trade-grafana/web ./monitoring/grafana
           docker push registry.heroku.com/sin-trade-grafana/web
 
       - name: Release Grafana app
