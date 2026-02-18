@@ -201,6 +201,8 @@ jobs:
           docker build \
             --platform linux/amd64 \
             --provenance=false \
+            --build-arg GF_SECURITY_ADMIN_USER=${{ secrets.GF_SECURITY_ADMIN_USER }} \
+            --build-arg GF_SECURITY_ADMIN_PASSWORD=${{ secrets.GF_SECURITY_ADMIN_PASSWORD }} \
             -t registry.heroku.com/sin-trade-grafana/web ./monitoring/grafana
           docker push registry.heroku.com/sin-trade-grafana/web
 
