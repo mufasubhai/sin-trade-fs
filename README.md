@@ -15,6 +15,7 @@ asdf set -u nodejs 22.1.0
 brew install pnpm
 cd sin-trade-fe 
 pnpm install
+cd .. (navigate back to root directory)
 
 create virtual environments. Important for launch.json
 python -m venv sin-trade-ds/ds-venv

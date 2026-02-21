@@ -200,10 +200,10 @@
       "gridPos": {
         "h": 4,
         "w": 6,
-        "x": 6,
+        "x": 12,
         "y": 0
       },
-      "id": 2,
+      "id": 7,
       "options": {
         "colorMode": "background",
         "graphMode": "none",
@@ -273,10 +273,10 @@
       "gridPos": {
         "h": 4,
         "w": 6,
-        "x": 6,
+        "x": 18,
         "y": 0
       },
-      "id": 2,
+      "id": 8,
       "options": {
         "colorMode": "background",
         "graphMode": "none",
@@ -435,10 +435,10 @@
       "gridPos": {
         "h": 4,
         "w": 6,
-        "x": 6,
+        "x": 12,
         "y": 4
       },
-      "id": 4,
+      "id": 9,
       "options": {
         "colorMode": "value",
         "graphMode": "none",
@@ -489,10 +489,10 @@
       "gridPos": {
         "h": 4,
         "w": 6,
-        "x": 6,
+        "x": 18,
         "y": 4
       },
-      "id": 4,
+      "id": 10,
       "options": {
         "colorMode": "value",
         "graphMode": "none",
@@ -655,7 +655,7 @@
           "expr": "up{job=\"sin-trade-fe\"}",
           "legendFormat": "Frontend",
           "range": true,
-          "refId": "C"
+          "refId": "D"
         }
       ],
       "title": "Service Uptime History",
@@ -795,7 +795,7 @@
           "expr": "scrape_duration_seconds{job=\"sin-trade-fe\"}",
           "legendFormat": "Frontend",
           "range": true,
-          "refId": "C"
+          "refId": "D"
         }
       ],
       "title": "Response Time History",
