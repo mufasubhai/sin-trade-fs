@@ -41,6 +41,17 @@ export default ({ mode }: { mode: string }): UserConfig => {
     test: {
       include: ["src/**/*.test.tsx", "src/**/*.spec.tsx"],
       environment: "jsdom",
+      coverage: {
+        provider: "v8",
+        reporter: ["text", "json", "html"],
+        reportsDirectory: "coverage",
+        thresholds: {
+          lines: 70,
+          branches: 70,
+          functions: 70,
+          statements: 70,
+        },
+      },
     },
   });
 };

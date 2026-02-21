@@ -3,7 +3,7 @@
 2. Add a prometheus check to grafana => this is basically a heartbeat to keep alive ~ 5 minutes  ✅
 3. Add a prometheus check to the frontend => same ~ 5 minutes ✅
 4. Add a DS heartbeat to prometheus. ~ 5 minutes ✅
-5. Add testing to current funcionality.
+5. Add testing to current functionality.
 6. Add Registration Page
 7. Add Charts
 8. Add first draft of data service logic for calculation of alert
