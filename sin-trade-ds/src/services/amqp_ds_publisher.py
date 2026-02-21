@@ -29,3 +29,6 @@ def publish_message(channel_name, message, exchange=""):
     finally:
         if connection and not connection.is_closed:
             connection.close()
+            
+
+

@@ -50,6 +50,8 @@ services:
     environment:
       - SIN_TRADE_BE_HOST=${SIN_TRADE_BE_HOST:-backend:5002}
       - SIN_TRADE_DS_HOST=${SIN_TRADE_DS_HOST:-ds:5004}
+      - SIN_TRADE_GRAFANA_HOST=${SIN_TRADE_GRAFANA_HOST:-grafana:3000}
+      - SIN_TRADE_FE_HOST=${SIN_TRADE_FE_HOST:-frontend:5173}
       - SCRAPE_SCHEME=${SCRAPE_SCHEME:-https}
     
     volumes:

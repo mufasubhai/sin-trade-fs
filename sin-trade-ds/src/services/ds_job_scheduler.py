@@ -1,12 +1,12 @@
-import os
+
 from datetime import datetime
 import asyncio
-import threading
+
 
 
 from src.services.alphavantage_services import fetch_history_for_asset
 from src.services.kraken_services import run_history_flow
-from src.services.amqp_ds_publisher import publish_message
+from src.services.prometheus_services import ping_prometheus
 
 
 ## here are the functions for scheduled jobs
@@ -56,3 +56,31 @@ def check_targets():
     except RuntimeError:
         # No event loop, create a new one
         asyncio.run(process_targets())
+        
+
+def keep_prometheus_alive():
+    print (f"Pinging Prometheus {datetime.now()}")
+    
+    async def process_prometheus_ping():
+        print(f"processing targets at {datetime.now()}")
+        
+        try:
+            history_flow_response = await ping_prometheus()
+        except Exception as e:
+            # email log this error maybe?
+            print(f"Error running history flow: {e}")  
+            
+        print('fetch active assets with targets')
+        print('perform calculations on targets')
+        print('send email notifications if targets are met')
+        
+    try:
+        loop = asyncio.get_event_loop()
+        if loop.is_running():
+            # If loop is already running, use run_coroutine_threadsafe
+            asyncio.run_coroutine_threadsafe(process_prometheus_ping(), loop)
+        else:
+            loop.run_until_complete(process_prometheus_ping())
+    except RuntimeError:
+        # No event loop, create a new one
+        asyncio.run(process_prometheus_ping())

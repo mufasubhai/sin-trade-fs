@@ -15,6 +15,7 @@ class DSConfig:
     CLOUDAMQP_URL = os.getenv("CLOUDAMQP_URL") or ""
     POLYGON_KEY = os.getenv("POLYGON_KEY") or ""
     ALPHAVANTAGE_KEY = os.getenv("ALPHAVANTAGE_KEY") or ""
+    SINE_TRADE_PROMETHEUS_URL = os.getenv("SINE_TRADE_PROMETHEUS_URL") or ""
 
     supabase: Client
     params = pika.URLParameters(CLOUDAMQP_URL)

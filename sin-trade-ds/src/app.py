@@ -5,7 +5,7 @@ from flask_cors import CORS
 from src.routes.test_routes import init_test_routes
 from apscheduler.schedulers.background  import BackgroundScheduler
 
-from src.services.ds_job_scheduler import  check_targets
+from src.services.ds_job_scheduler import  check_targets, keep_prometheus_alive
 from src.services.amqp_ds_subscriber import subscribe_to_queues
 from src.services.amqp_ds_publisher import declare_queues
 
@@ -38,7 +38,8 @@ if __name__ == "src.app":
     try:
         scheduler = BackgroundScheduler()
         scheduler.add_executor("processpool")
-        scheduler.add_job(check_targets, "interval", minutes=1)
+        scheduler.add_job(check_targets, "interval", minutes=5)
+        scheduler.add_job(keep_prometheus_alive, "interval", minutes=10)
         declare_queues()
         subscribe_to_queues()
         scheduler.start()
@@ -52,7 +53,8 @@ if __name__ == "__main__":
     try:
         scheduler = BackgroundScheduler()
         scheduler.add_executor("processpool")
-        scheduler.add_job(check_targets, "interval", minutes=1)
+        scheduler.add_job(check_targets, "interval", minutes=5)
+        scheduler.add_job(keep_prometheus_alive, "interval", minutes=10)
         declare_queues()
         subscribe_to_queues()
         scheduler.start()

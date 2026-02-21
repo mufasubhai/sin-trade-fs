@@ -13,13 +13,6 @@ import json
 import time
 from datetime import date, datetime
 
-def main():
-   response = request(
-      method="GET",
-      path="/0/public/Ticker",
-      environment="https://api.kraken.com",
-   )
-   print(response.read().decode())
 
 def request(method: str = "GET", path: str = "", query: dict | None = None, body: dict | None = None, public_key: str = "", private_key: str = "", environment: str = "") -> http.client.HTTPResponse:
    url = environment + path
