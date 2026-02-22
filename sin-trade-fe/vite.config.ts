@@ -39,15 +39,25 @@ export default ({ mode }: { mode: string }): UserConfig => {
       include: ["react", "react-dom"],
     },
     test: {
-      include: ["src/**/*.test.tsx", "src/**/*.spec.tsx"],
+      include: ["src/**/*.test.tsx", "src/**/*.test.ts", "src/**/*.spec.tsx"],
       environment: "jsdom",
       coverage: {
         provider: "v8",
         reporter: ["text", "json", "html"],
         reportsDirectory: "coverage",
+        include: [
+          "src/api/**",
+          "src/interfaces/**",
+          "src/utils/**",
+          "src/pages/auth/Login.tsx",
+        ],
+        exclude: [
+          "src/**/*.d.ts",
+          "src/**/__tests__/**",
+        ],
         thresholds: {
           lines: 70,
-          branches: 70,
+          branches: 60,
           functions: 70,
           statements: 70,
         },

@@ -4,6 +4,8 @@
 # Logs
 logs
 sin_trade_fe/*.log
+sin_trade_fe/coverage*.json
+sin_trade_fe/coverage*.lcov
 sin_trade_fe/npm-debug.log*
 sin_trade_fe/yarn-debug.log*
 sin_trade_fe/yarn-error.log*
