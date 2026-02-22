@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { AssetSchema, UserResponseSchema, Asset, UserResponse } from "../../interfaces/UserInterface";
+import { AssetSchema, UserResponseSchema} from "../../interfaces/UserInterface";
 
 describe("UserInterface Schemas", () => {
   describe("AssetSchema", () => {
