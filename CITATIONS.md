@@ -6,7 +6,25 @@
 # Claude. (Dec 2025). (Sonnet 4) [Large Language model]. https://claude.ai
 
 
-# Open Code Prompt History
+## Created Using suggestiopns from Open Code 
+# OpenCode. (Feb 2025) (OpenCode/Big-Pickle) [Large Language model]. https://opencode.ai/
+
+
+## Open Code Prompt History
+1. 02/21/2026
+- "is my def main(): response = request(method="GET", path="/0/public/Ticker"...) function in my kraken service being used anywhere?"
+- "Can you do a quick check of current unstaged git changes to see if there's anything concerning?"
+- "how does that file look now?"
+- "Ignoring Grafana And prometheus, look at current testing for frontend, BE and DS and highlight weaknesses. How can we implement test coverage metrics across all three?"
+- Help me write tests for my ds to get to > 70% test coverage"
+- "Proceed with making the changes. I will review and ask questions after the fact"
+- "It looks like there was a bunch of extra/unused code in my kraken service. I've removed it to simplify the methods. Can you double check to make sure nothing ther is broken and update the kraken tests accordingly?"
+- "AWesome. Now do the same thing for the BE"
+- "Run me through all of the tests that have been added"
+- "Is there an easy way to generate a list of all the prompts I've given you from this session?"
+- "can you just give me a list of all my prompts with timestamps next to them from this session?"
+
+
 
 # Claude Code Prompt History
 {"display":"what about AMQP stack terminated, failed to connect or aborted","pastedContents":{},"timestamp":1769448811004,"project":"/Users/adrianapodaca/Repositories/MSC/sin_trade_full_stack","sessionId":"d173f109-3952-45d6-887e-5a2f5a575d58"}
