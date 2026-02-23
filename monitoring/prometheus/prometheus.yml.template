@@ -26,24 +26,4 @@ scrape_configs:
       - source_labels: [__address__]
         target_label: instance
         replacement: 'sin-trade-ds'
-  
-  - job_name: 'sin-trade-grafana'
-    metrics_path: /api/health
-    scheme: ${SCRAPE_SCHEME}
-    static_configs:
-      - targets: ['${SIN_TRADE_GRAFANA_HOST}']
-    relabel_configs:
-      - source_labels: [__address__]
-        target_label: instance
-        replacement: 'sin-trade-grafana'
-  
-  - job_name: 'sin-trade-fe'
-    metrics_path: /
-    scheme: ${SCRAPE_SCHEME}
-    static_configs:
-      - targets: ['${SIN_TRADE_FE_HOST}']
-    relabel_configs:
-      - source_labels: [__address__]
-        target_label: instance
-        replacement: 'sin-trade-fe'
-  
+

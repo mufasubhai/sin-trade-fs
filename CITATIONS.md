@@ -23,8 +23,14 @@
 - "Run me through all of the tests that have been added"
 - "Is there an easy way to generate a list of all the prompts I've given you from this session?"
 - "can you just give me a list of all my prompts with timestamps next to them from this session?"
-
-
+1. "A little too much too quickly. I've reverted local changes. Can you think of the most simple way to change it so that prometheus shows up when a service returns 200."
+2. "f" (short for "fix" - wanting simplest approach)
+3. "How about this, can you just remove the UI elements for them in the dashboard, but keep the job to ping them? I'm mainly concerned with making sure they don't sleep."
+4. "set to invisible"
+5. "A more complicated task. Look at my login page. I'm using supabase. Make a register page with state and api calls based on the registration endpoints I already have as well as the register page I have started."
+6. "Add back the avatar parameter. Also, thios requires email confirmation. I the response from register looks like this,open a popup that says "Registration Successful! Please check your email for the verification link, and then login" this modal should use the standard close modal I've created and then redirect the user to the login page on close. Also, the Register button should be disabled until a user has entered email, first name and last name, and password/ confirm password. Finally, re-add the a non mandatoiry avatar URL field."
+7. "Add frontend tests for auth."
+8. "YES PLEASE"
 
 # Claude Code Prompt History
 {"display":"what about AMQP stack terminated, failed to connect or aborted","pastedContents":{},"timestamp":1769448811004,"project":"/Users/adrianapodaca/Repositories/MSC/sin_trade_full_stack","sessionId":"d173f109-3952-45d6-887e-5a2f5a575d58"}
