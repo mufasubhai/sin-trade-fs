@@ -40,8 +40,8 @@ if __name__ == "src.app":
     try:
         scheduler = BackgroundScheduler()
         scheduler.add_executor("processpool")
-        declare_queues()
-        subscribe_to_queues()
+        # declare_queues()
+        # subscribe_to_queues()
         scheduler.start()
     except Exception as e:
         print(f"Failed to start scheduler: {e}")

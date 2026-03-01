@@ -48,6 +48,19 @@ def list_assets(user_id):
         return jsonify({'error': str(e)}), 500
         
 
+@asset_controller.route('/history/<ticker_code>', methods=['GET'])
+@require_auth
+def asset_history(ticker_code):
+    try:
+        days = request.args.get('days', 14, type=int)
+        response_data, status_code = AssetService.getAssetHistory(ticker_code, days)
+        return response_data, status_code
+    except HTTPException as e:
+        return jsonify({'error': str(e.description)}), e.code
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
 @asset_controller.route('/asset/<asset_id>/<user_id>', methods=['DELETE'])
 @require_auth
 def single_asset(asset_id, user_id):

@@ -2,6 +2,10 @@ import React, { createContext, useState, useEffect } from "react";
 import { Asset, UserResponse } from "../interfaces/UserInterface";
 import { dataUrl } from "../api/AuthConfig";
 import { ListAssetResponseSchema } from "../interfaces/ListAssetResponse";
+import { getAssetHistory } from "../api/GetAssetHistory";
+import {
+  type AssetHistoryEntry,
+} from "../interfaces/AssetHistory";
 
 // what is missing is a function to disable tokens after a certain amount of time.
 // we should save the date of creation of the tokens and disable them after a certain amount of time.
@@ -16,7 +20,9 @@ export interface AuthContextType {
   tokenCreationDate: Date | null;
   user: UserResponse | null;
   assets: Record<string, Asset>;
+  assetHistory: Record<string, AssetHistoryEntry>;
   fetchAssets: () => Promise<void>;
+  fetchAssetHistory: (tickerCode: string, days?: number) => Promise<void>;
   addAssetToDB: (
     assetTicker: string,
     userId: number,
@@ -67,6 +73,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const [assets, setAssets] = useState<Record<string, Asset>>({});
+  const [assetHistory, setAssetHistory] = useState<
+    Record<string, AssetHistoryEntry>
+  >({});
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [tokenCreationDate, setTokenCreationDate] = useState<Date | null>(null);
   const [refreshToken, setRefreshToken] = useState<string | null>(null);
@@ -131,6 +140,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
+  const fetchAssetHistory = async (tickerCode: string, days = 14) => {
+    setAssetHistory((prev) => ({
+      ...prev,
+      [tickerCode]: { data: prev[tickerCode]?.data ?? [], status: "loading" },
+    }));
+    try {
+      const data = await getAssetHistory(tickerCode, accessToken ?? "", days);
+      setAssetHistory((prev) => ({
+        ...prev,
+        [tickerCode]: { data, status: "loaded" },
+      }));
+    } catch (error) {
+      console.error("Error fetching asset history", error);
+      setAssetHistory((prev) => ({
+        ...prev,
+        [tickerCode]: { data: [], status: "error" },
+      }));
+    }
+  };
+
   const addAssetToDB = async (
     assetTicker: string,
     userId: number,
@@ -181,6 +210,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setTokenCreationDate(null);
     setAccessToken(null);
     setAssets({});
+    setAssetHistory({});
     setRefreshToken(null);
     setUser(null);
     setIsAuthenticated(false);
@@ -192,11 +222,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         accessToken,
         addAssetToDB,
         assets,
+        assetHistory,
         deleteAssetFromDB,
         setAssets,
         refreshToken,
         user,
         fetchAssets,
+        fetchAssetHistory,
         loginUser,
         tokenCreationDate,
         logoutUser,

@@ -5,7 +5,7 @@ import {
   Switch,
   SwitchField,
 } from "../../components/catalyst_components/switch";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Input from "../../components/Input";
 
 import {
@@ -42,6 +42,7 @@ import GenericModal from "../../components/GenericModal";
 import { addAsset } from "../../api/AddAsset";
 import { Asset } from "../../interfaces/UserInterface";
 import { deleteAsset } from "../../api/DeleteAsset";
+import AssetChart from "../../components/AssetChart";
 
 const navigation = [
   { name: "Dashboard", href: "#", icon: HomeIcon, current: true },
@@ -62,9 +63,20 @@ export default function Dashboard() {
     fetchAssets,
     addAssetToDB,
     assets,
+    assetHistory,
+    fetchAssetHistory,
     logoutUser,
     deleteAssetFromDB,
   }: AuthContextType = useAuth();
+
+  useEffect(() => {
+    Object.keys(assets).forEach((ticker) => {
+      if (!assetHistory[ticker] || assetHistory[ticker].status === "idle") {
+        void fetchAssetHistory(ticker);
+      }
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [assets]);
 
   const userNavigation = [
     // { name: "Your profile" },
@@ -326,14 +338,24 @@ export default function Dashboard() {
                 return (
                   <div
                     key={asset.assetId}
-                    className="flex flex-row justify-between w-40"
+                    className="flex flex-row items-center gap-4 w-full border-b border-gray-100 py-3"
                   >
-                    <h1>{asset.tickerName}</h1>
+                    <span className="w-16 shrink-0 text-sm font-semibold text-gray-900">
+                      {asset.tickerName}
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <AssetChart 
+                        entry={assetHistory[asset.tickerName]} 
+                        tickerCode={asset.tickerName}
+                        onDaysChange={(ticker: string, days: number) => { void fetchAssetHistory(ticker, days); }}
+                      />
+                    </div>
                     <button
                       onClick={() => {
                         setDeleteModalOpen(true);
                         setAssetToDelete(asset);
                       }}
+                      className="shrink-0"
                     >
                       <TrashIcon className="size-6" />
                     </button>

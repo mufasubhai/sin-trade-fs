@@ -40,5 +40,8 @@ source sin-trade-ds/ds-venv/bin/activate
 cd sin-trade-ds
 pytest
 
+to run tests in frontend
+cd sin-trade-fe
+pnpm test
 
 

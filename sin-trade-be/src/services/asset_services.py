@@ -1,4 +1,5 @@
 # services/auth_services.py
+from datetime import datetime, timedelta
 from src.models.active_assets_model import ActiveAssets
 from src.config import BackendConfig
 from src.services.fetching_services.alphavantage_constants import fromToAlpha
@@ -84,10 +85,10 @@ class AssetService:
                         return {"message": "User assets not found"}, 500
                     
                     # in the case of initial fetch being complete, we want to return historical data
-                    if (initial_fetch_complete == True):
-                        # need to verify whether or not this is actually correct
-                        historical_data_response = BackendConfig.supabase.table("asset_prices").select("*").eq("from_asset_code", data['ticker_code']).execute()
-                        historical_data = historical_data_response.data
+                    # if (initial_fetch_complete == True):
+                    #     # need to verify whether or not this is actually correct
+                    #     historical_data_response = BackendConfig.supabase.table("asset_prices").select("*").eq("from_asset_code", data['ticker_code']).execute()
+                    #     historical_data = historical_data_response.data
                         
         
                 return {
@@ -122,5 +123,43 @@ class AssetService:
         except Exception as e:
             return {"message": str(e), "status": 500}, 500
     
-    # @staticmethod   
+    # @staticmethod
     # def listAssets(data)
+
+    @staticmethod
+    def getAssetHistory(ticker_code, days=14):
+        try:
+            if not BackendConfig.supabase_service:
+                return {"message": "Database connection unsuccessful"}, 500
+
+            start_date = (datetime.now() - timedelta(days=days)).isoformat()
+            
+            response = (
+                BackendConfig.supabase_service
+                .table("asset_prices")
+                .select("*")
+                .eq("from_asset_code", ticker_code)
+                .gte("date", start_date[:10])
+                .order("date")
+                .execute()
+            )
+            
+            result = []
+            for row in response.data:
+                if row.get("price_time"):
+                    result.append({**row, "interval": "5min"})
+                else:
+                    day = datetime.fromisoformat(row["date"])
+                    for i in range(288):
+                        slot_time = day + timedelta(minutes=5 * i)
+                        result.append({
+                            **row,
+                            "price_time": slot_time.isoformat(),
+                            "interval": "daily_expanded",
+                        })
+
+            result.sort(key=lambda r: r["price_time"])
+            return {"data": result, "message": "History fetched successfully", "status": 200}, 200
+
+        except Exception as e:
+            return {"message": str(e)}, 500
