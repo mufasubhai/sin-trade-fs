@@ -24,34 +24,34 @@ const makeEntry = (
 
 describe("AssetChart", () => {
   it("renders loading skeleton when status is loading", () => {
-    render(<AssetChart entry={makeEntry("loading")} />);
+    render(<AssetChart entry={makeEntry("loading")} onDaysChange={() => {console.log("test");}} tickerCode={""} />);
     expect(screen.getByTestId("chart-loading")).not.toBeNull();
   });
 
   it("renders loading skeleton when status is idle", () => {
-    render(<AssetChart entry={makeEntry("idle")} />);
+    render(<AssetChart entry={makeEntry("idle")} onDaysChange={() => {console.log("test");}} tickerCode={""} />);
     expect(screen.getByTestId("chart-loading")).not.toBeNull();
   });
 
   it("renders loading skeleton when entry is undefined", () => {
-    render(<AssetChart entry={undefined} />);
+    render(<AssetChart entry={undefined} onDaysChange={() => {console.log("test");}} tickerCode={""} />);
     expect(screen.getByTestId("chart-loading")).not.toBeNull();
   });
 
   it("renders error state when status is error", () => {
-    render(<AssetChart entry={makeEntry("error")} />);
+    render(<AssetChart entry={makeEntry("error")} onDaysChange={() => {console.log("test");}} tickerCode={""} />);
     expect(screen.getByTestId("chart-error")).not.toBeNull();
     expect(screen.getByText(/failed to load/i)).not.toBeNull();
   });
 
   it("renders empty state when loaded with no data", () => {
-    render(<AssetChart entry={makeEntry("loaded", 0)} />);
+    render(<AssetChart entry={makeEntry("loaded", 0)} onDaysChange={() => {console.log("test");}} tickerCode={""} />);
     expect(screen.getByTestId("chart-empty")).not.toBeNull();
     expect(screen.getByText(/no data available/i)).not.toBeNull();
   });
 
   it("renders chart when loaded with data", () => {
-    render(<AssetChart entry={makeEntry("loaded", 10)} />);
+    render(<AssetChart entry={makeEntry("loaded", 10)} onDaysChange={() => {console.log("test");}} tickerCode={""} />);
     expect(screen.getByTestId("chart-loaded")).not.toBeNull();
   });
 });
