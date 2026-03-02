@@ -38,9 +38,9 @@ if __name__ == "src.app":
     try:
         scheduler = BackgroundScheduler()
         scheduler.add_executor("processpool")
-        # scheduler.add_job(check_targets, "interval", minutes=5)
-        # scheduler.add_job(run_ml_trading_cron, "interval", seconds=30)
-        # scheduler.add_job(compute_ticker_stats, "interval", minutes=5)
+        scheduler.add_job(check_targets, "interval", minutes=5)
+        scheduler.add_job(run_ml_trading_cron, "interval", hours=1)
+        scheduler.add_job(compute_ticker_stats, "interval", hours=1)
         declare_queues()
         subscribe_to_queues()
         scheduler.start()
