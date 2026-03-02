@@ -14,6 +14,8 @@ class BackendConfig:
     CORS_ORIGINS = os.getenv("CORS_ORIGINS") or "http://localhost:5173"
     ENVIRONMENT = os.getenv("ENVIRONMENT") or "production"
     CLOUDAMQP_URL = os.getenv("CLOUDAMQP_URL") or ""
+    RESEND_API_KEY: str = os.getenv("RESEND_API_KEY") or ""
+    RESEND_EMAIL_FROM: str = os.getenv("RESEND_EMAIL_FROM") or "SinTrade <onboarding@resend.dev>"
 
     supabase: Client
     supabase_service: Client

@@ -5,7 +5,7 @@ from flask_cors import CORS
 from src.routes.test_routes import init_test_routes
 from apscheduler.schedulers.background  import BackgroundScheduler
 
-from src.services.ds_job_scheduler import  check_targets
+from src.services.ds_job_scheduler import  check_targets, run_ml_trading_cron, compute_ticker_stats
 from src.services.amqp_ds_subscriber import subscribe_to_queues
 from src.services.amqp_ds_publisher import declare_queues
 
@@ -39,9 +39,10 @@ if __name__ == "src.app":
         scheduler = BackgroundScheduler()
         scheduler.add_executor("processpool")
         # scheduler.add_job(check_targets, "interval", minutes=5)
-        # scheduler.add_job(keep_prometheus_alive, "interval", minutes=10)
-        # declare_queues()
-        # subscribe_to_queues()
+        # scheduler.add_job(run_ml_trading_cron, "interval", seconds=30)
+        # scheduler.add_job(compute_ticker_stats, "interval", minutes=5)
+        declare_queues()
+        subscribe_to_queues()
         scheduler.start()
     except Exception as e:
         print(f"Failed to start scheduler: {e}")
@@ -54,7 +55,8 @@ if __name__ == "__main__":
         scheduler = BackgroundScheduler()
         scheduler.add_executor("processpool")
         scheduler.add_job(check_targets, "interval", minutes=5)
-        # scheduler.add_job(keep_prometheus_alive, "interval", minutes=10)
+        scheduler.add_job(run_ml_trading_cron, "interval", hours=1)
+        scheduler.add_job(compute_ticker_stats, "interval", hours=1)
         declare_queues()
         subscribe_to_queues()
         scheduler.start()
