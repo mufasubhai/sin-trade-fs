@@ -51,7 +51,7 @@ class EmailService:
                 logging.warning(f"No valid signals for user {user_id}")
                 return True
                 
-            subject = f"SinTrade Alert: {signal_summary['action']} - {signal_summary['total']} Signal(s)"
+            subject = f"SinTrade Alert: {signal_summary['total']} Signal(s) Updated"
             html_body = EmailService._build_html_email_body(signals, signal_summary)
             
             try:
@@ -106,12 +106,12 @@ class EmailService:
     @staticmethod
     def _build_signal_summary(signals: list) -> dict:
         if not signals:
-            return {"buy_count": 0, "sell_count": 0, "action": "Hold", "total": 0}
+            return {"buy_count": 0, "sell_count": 0, "action": "Neutral", "total": 0}
             
         buy_count = sum(1 for s in signals if s and s.get("signal_type") == "buy")
         sell_count = sum(1 for s in signals if s and s.get("signal_type") == "sell")
         
-        action = "Buy & Sell" if buy_count > 0 and sell_count > 0 else "Buy" if buy_count > 0 else "Sell" if sell_count > 0 else "Hold"
+        action = "Buy & Sell" if buy_count > 0 and sell_count > 0 else "Buy" if buy_count > 0 else "Sell" if sell_count > 0 else "Neutral"
         
         return {
             "buy_count": buy_count,
@@ -130,6 +130,8 @@ class EmailService:
             if not signal:
                 continue
             signal_type = (signal.get("signal_type") or "unknown").upper()
+            if signal_type == "HOLD":
+                signal_type = "NEUTRAL"
             confidence = signal.get("confidence_score", 0) or signal.get("confidence", 0) or 0
             price = signal.get("price_at_signal", 0) or 0
             ticker_code = signal.get("ticker_code") or "UNKNOWN"

@@ -324,6 +324,12 @@ class MLTradingService:
                     was_correct = price_4h_later > price_at_signal
                     if price_at_signal > 0:
                         profit_loss_percent = ((price_4h_later - price_at_signal) / price_at_signal) * 100
+                elif signal["signal_type"] == "hold":
+                    if price_at_signal > 0:
+                        price_change_pct = ((price_4h_later - price_at_signal) / price_at_signal) * 100
+                        abs_change = abs(price_change_pct)
+                        was_correct = abs_change < self.min_price_movement_pct
+                        profit_loss_percent = price_change_pct
 
                 DSConfig.supabase.table("ml_signal_history").insert({
                     "signal_id": signal["id"],
@@ -380,7 +386,9 @@ class MLTradingService:
             if not analysis["has_sufficient_data"]:
                 continue
 
-            if analysis["signal"] == "hold" or analysis["confidence"] < min_confidence_threshold:
+            if analysis["signal"] == "hold":
+                pass
+            elif analysis["confidence"] < min_confidence_threshold:
                 continue
 
             features = self.extract_features(ticker_code, analysis)
@@ -405,18 +413,6 @@ class MLTradingService:
                     user_int_id = user_asset.get("user_id")
                     
                     if not user_int_id:
-                        continue
-                    
-                    existing_signal = (
-                        DSConfig.supabase.table("ml_trade_signals")
-                        .select("id")
-                        .eq("asset_id", asset_id)
-                        .eq("user_id", user_int_id)
-                        .eq("is_active", True)
-                        .execute()
-                    )
-                    
-                    if existing_signal.data:
                         continue
                     
                     expires_at = datetime.now() + timedelta(hours=self.target_hours)
