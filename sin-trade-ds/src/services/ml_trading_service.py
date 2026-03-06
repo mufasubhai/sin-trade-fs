@@ -16,7 +16,8 @@ class MLTradingService:
         self.target_hours = 4
         self.min_data_points = 20
         self.default_frequency = 0.25
-        self.min_price_movement_pct = 3.0
+        self.min_price_movement_pct = 2.0
+        self.min_peak_distance = 12
 
     def fetch_asset_price_history(
         self, ticker_code: str, hours: int = 24
@@ -110,7 +111,21 @@ class MLTradingService:
             elif prices[i] < prices[i - 1] and prices[i] < prices[i + 1]:
                 valleys.append(i)
 
+        peaks = self._filter_close_peaks(peaks, prices)
+        valleys = self._filter_close_peaks(valleys, prices)
+
         return peaks, valleys
+
+    def _filter_close_peaks(self, indices: List[int], prices: np.ndarray) -> List[int]:
+        if not indices or len(indices) < 2:
+            return indices
+        
+        filtered = [indices[0]]
+        for i in range(1, len(indices)):
+            if indices[i] - filtered[-1] >= self.min_peak_distance:
+                filtered.append(indices[i])
+        
+        return filtered
 
     def analyze_price_action(
         self, ticker_code: str, asset_id: Optional[int] = None
@@ -164,12 +179,17 @@ class MLTradingService:
                 signal = "buy"
                 expected_movement_pct = buy_movement_pct
                 confidence = min(0.95, (1 - normalized_position) + 0.1)
-            elif trend_strength > 0.5:
+            elif trend_strength > 0.7:
+                signal = "buy"
+                confidence = min(0.9, 0.5 + trend_strength * 0.4)
+                expected_movement_pct = trend_strength * 5
+            elif trend_strength < -0.7:
+                signal = "sell"
+                confidence = min(0.9, 0.5 + abs(trend_strength) * 0.4)
+                expected_movement_pct = abs(trend_strength) * 5
+            elif abs(trend_strength) > 0.4:
                 signal = "hold"
-                confidence = min(0.9, 0.5 + trend_strength * 0.3)
-            elif trend_strength < -0.5:
-                signal = "hold"
-                confidence = min(0.9, 0.5 + abs(trend_strength) * 0.3)
+                confidence = min(0.8, 0.5 + abs(trend_strength) * 0.3)
 
         return {
             "asset_id": asset_id,
@@ -324,12 +344,6 @@ class MLTradingService:
                     was_correct = price_4h_later > price_at_signal
                     if price_at_signal > 0:
                         profit_loss_percent = ((price_4h_later - price_at_signal) / price_at_signal) * 100
-                elif signal["signal_type"] == "hold":
-                    if price_at_signal > 0:
-                        price_change_pct = ((price_4h_later - price_at_signal) / price_at_signal) * 100
-                        abs_change = abs(price_change_pct)
-                        was_correct = abs_change < self.min_price_movement_pct
-                        profit_loss_percent = price_change_pct
 
                 DSConfig.supabase.table("ml_signal_history").insert({
                     "signal_id": signal["id"],

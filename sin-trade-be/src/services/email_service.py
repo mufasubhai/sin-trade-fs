@@ -13,7 +13,7 @@ class EmailService:
             pacific_tz = ZoneInfo("America/Los_Angeles")
             now_pacific = datetime.now(pacific_tz)
             hour = now_pacific.hour
-            return 8 <= hour < 22
+            return 5 <= hour < 23
         except Exception as e:
             logging.warning(f"Error checking time: {e}, defaulting to send")
             return True
@@ -25,7 +25,7 @@ class EmailService:
             return True
             
         if not EmailService.is_within_allowed_hours():
-            logging.info(f"Outside allowed hours (8am-10pm PT), skipping email to {user_email}")
+            logging.info(f"Outside allowed hours (5am-11pm PT), skipping email to {user_email}")
             EmailService._store_email_notification(
                 user_id=user_id,
                 email=user_email,

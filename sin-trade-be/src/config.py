@@ -15,6 +15,7 @@ class BackendConfig:
     ENVIRONMENT = os.getenv("ENVIRONMENT") or "production"
     CLOUDAMQP_URL = os.getenv("CLOUDAMQP_URL") or ""
     RESEND_API_KEY: str = os.getenv("RESEND_API_KEY") or ""
+    SIN_TRADE_DS_HOST = os.getenv("SIN_TRADE_DS_HOST") or ""
     RESEND_EMAIL_FROM: str = os.getenv("RESEND_EMAIL_FROM") or "SinTrade <onboarding@resend.dev>"
 
     supabase: Client

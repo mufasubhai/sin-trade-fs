@@ -13,6 +13,7 @@ class DSConfig:
     CORS_ORIGINS = os.getenv("CORS_ORIGINS") or "http://localhost:5173"
     ENVIRONMENT = os.getenv("ENVIRONMENT") or "production"
     CLOUDAMQP_URL = os.getenv("CLOUDAMQP_URL") or ""
+    SIN_TRADE_BE_HOST = os.getenv("SIN_TRADE_BE_HOST") or ""
     POLYGON_KEY = os.getenv("POLYGON_KEY") or ""
     ALPHAVANTAGE_KEY = os.getenv("ALPHAVANTAGE_KEY") or ""
     SINE_TRADE_PROMETHEUS_URL = os.getenv("SINE_TRADE_PROMETHEUS_URL") or ""

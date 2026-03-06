@@ -7,7 +7,7 @@ import json
 
 from src.services.alphavantage_services import fetch_history_for_asset
 from src.services.kraken_services import run_history_flow
-from src.services.prometheus_services import ping_prometheus
+from src.services.ping_services import ping_backend, ping_prometheus
 from src.services.ml_trading_service import run_ml_trading_analysis
 from src.services.amqp_ds_publisher import publish_message
 
@@ -87,6 +87,33 @@ def keep_prometheus_alive():
     except RuntimeError:
         # No event loop, create a new one
         asyncio.run(process_prometheus_ping())
+
+def keep_backend_alive():
+    print (f"Pinging Backend {datetime.now()}")
+    
+    async def process_backend_ping():
+        print(f"processing backend at {datetime.now()}")
+        
+        try:
+            backend_response = await ping_backend()
+        except Exception as e:
+            # email log this error maybe?
+            print(f"Error running backend ping: {e}")  
+            
+        print('fetch active assets with targets')
+        print('perform calculations on targets')
+        print('send email notifications if targets are met')
+        
+    try:
+        loop = asyncio.get_event_loop()
+        if loop.is_running():
+            # If loop is already running, use run_coroutine_threadsafe
+            asyncio.run_coroutine_threadsafe(process_backend_ping(), loop)
+        else:
+            loop.run_until_complete(process_backend_ping())
+    except RuntimeError:
+        # No event loop, create a new one
+        asyncio.run(process_backend_ping())
 
 
 def run_ml_trading_cron():

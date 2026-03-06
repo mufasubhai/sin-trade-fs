@@ -444,4 +444,5 @@ class TestMLTradingServiceDefaults:
         assert service.target_hours == 4
         assert service.min_data_points == 20
         assert service.default_frequency == 0.25
-        assert service.min_price_movement_pct == 3.0
+        assert service.min_price_movement_pct == 2.0
+        assert service.min_peak_distance == 12

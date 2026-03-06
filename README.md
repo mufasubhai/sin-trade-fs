@@ -44,4 +44,6 @@ to run tests in frontend
 cd sin-trade-fe
 pnpm test
 
-
+TODO:
+- Automate logout
+- Improve style on extra tabs
