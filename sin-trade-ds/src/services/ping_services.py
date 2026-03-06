@@ -21,7 +21,7 @@ async def ping_backend():
     print(f"Pinging Backend at {DSConfig.SIN_TRADE_BE_HOST} - {datetime.now()}")
     try:
         urllib.request.urlopen(
-            DSConfig.SIN_TRADE_BE_HOST
+            f'{DSConfig.SIN_TRADE_BE_HOST}/health'
         )
 
     

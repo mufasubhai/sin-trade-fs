@@ -6,10 +6,10 @@ import json
 from src.services.ping_services import ping_ds
 
 def keep_ds_alive():
-    print (f"Pinging Backend {datetime.now()}")
+    print (f"Pinging DS at {datetime.now()}")
     
     async def process_ds_ping():
-        print(f"processing backend at {datetime.now()}")
+        print(f"Processing DS ping at {datetime.now()}")
         
         try:
             backend_response = await ping_ds()
