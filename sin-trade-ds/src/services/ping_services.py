@@ -7,7 +7,7 @@ async def ping_prometheus():
     print(f"Pinging Prometheus at {DSConfig.SINE_TRADE_PROMETHEUS_URL} - {datetime.now()}")
     try:
         urllib.request.urlopen(
-            f'{DSConfig.SINE_TRADE_PROMETHEUS_URL}/health'
+            DSConfig.SINE_TRADE_PROMETHEUS_URL
         )
 
     
