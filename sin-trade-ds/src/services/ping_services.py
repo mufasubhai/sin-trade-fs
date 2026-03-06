@@ -18,16 +18,16 @@ async def ping_prometheus():
    
    
 async def ping_backend(): 
-    print(f"Pinging Backend at {DSConfig.SIN_TRADE_BA} - {datetime.now()}")
+    print(f"Pinging Backend at {DSConfig.SIN_TRADE_BE_HOST} - {datetime.now()}")
     try:
         urllib.request.urlopen(
-            DSConfig.SIN_TRADE_BA
+            DSConfig.SIN_TRADE_BE_HOST
         )
 
     
     except Exception as e:
         print(f"Error pinging Backend: {e}")
     
-    print(f"Successfully pinged Backend at {DSConfig.SIN_TRADE_BA}")
+    print(f"Successfully pinged Backend at {DSConfig.SIN_TRADE_BE_HOST}")
    
    

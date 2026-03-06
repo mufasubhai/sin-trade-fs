@@ -7,7 +7,7 @@ from src.routes.asset_routes import init_asset_routes
 from apscheduler.schedulers.background  import BackgroundScheduler
 from src.services.amqp_be_subscriber import subscribe_to_queues
 from src.services.amqp_be_publisher import declare_queues
-from src.services.be_job_scheduler import ping_ds
+from src.services.be_job_scheduler import keep_ds_alive
 
 
 # from models.user_model import db
@@ -42,7 +42,7 @@ if __name__ == "src.app":
         scheduler = BackgroundScheduler()
         scheduler.add_executor("processpool")
         declare_queues()
-        scheduler.add_job(ping_ds, "interval", minutes=20)
+        scheduler.add_job(keep_ds_alive, "interval", minutes=20)
         subscribe_to_queues()
         scheduler.start()
     except Exception as e:
@@ -56,7 +56,7 @@ if __name__ == "__main__":
         scheduler = BackgroundScheduler()
         scheduler.add_executor("processpool")
         declare_queues()
-        scheduler.add_job(ping_ds, "interval", minutes=20)
+        scheduler.add_job(keep_ds_alive, "interval", minutes=20)
         subscribe_to_queues()
         scheduler.start()
     except Exception as e:
