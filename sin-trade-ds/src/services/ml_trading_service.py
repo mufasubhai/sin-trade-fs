@@ -299,6 +299,37 @@ class MLTradingService:
             print(f"Error getting last purchased: {e}")
             return None
 
+    def get_price_at_time(
+        self, ticker_code: str, target_time: datetime
+    ) -> Optional[float]:
+        try:
+            if not DSConfig.supabase:
+                return None
+
+            time_range = timedelta(hours=1)
+            start_time = target_time - time_range
+            end_time = target_time + time_range
+
+            response = (
+                DSConfig.supabase.table("asset_prices")
+                .select("current_price, price_time")
+                .eq("from_asset_code", ticker_code)
+                .gte("price_time", start_time.isoformat())
+                .lte("price_time", end_time.isoformat())
+                .order("price_time")
+                .limit(1)
+                .execute()
+            )
+
+            if response.data:
+                return float(response.data[0]["current_price"])
+
+            return None
+
+        except Exception as e:
+            print(f"Error getting price at time: {e}")
+            return None
+
     def predict_price_at_future(
         self, ticker_code: str, hours_ahead: float = 16
     ) -> Optional[float]:
@@ -445,11 +476,13 @@ class MLTradingService:
             now = datetime.now(timezone.utc)
             is_recently_purchased = False
             hold_reason = None
+            purchase_price = None
             
             if last_purchased:
                 hours_since_purchase = (now - last_purchased).total_seconds() / 3600
                 if hours_since_purchase < self.hold_after_purchase_hours:
                     is_recently_purchased = True
+                    purchase_price = self.get_price_at_time(ticker_code, last_purchased)
             
             success_rate, total_signals = self.get_ticker_success_rate(ticker_code)
             
@@ -483,12 +516,26 @@ class MLTradingService:
                 if predicted_price and current_price and current_price > 0:
                     price_change_pct = ((predicted_price - current_price) / current_price) * 100
                     
-                    if price_change_pct > 0:
-                        signal = "hold_to_avoid_losses"
-                        hold_reason = f"price predicted +{price_change_pct:.1f}% in {self.prediction_horizon_hours}h (purchased {hours_since_purchase:.1f}h ago)"
-                        analysis["confidence"] = min(analysis["confidence"], 0.7)
+                    profit_loss_pct = None
+                    if purchase_price and purchase_price > 0:
+                        profit_loss_pct = ((current_price - purchase_price) / purchase_price) * 100
+                    
+                    if profit_loss_pct is not None:
+                        if price_change_pct > 0 and profit_loss_pct > 0:
+                            signal = "hold_to_avoid_losses"
+                            hold_reason = f"predicted +{price_change_pct:.1f}% in {self.prediction_horizon_hours}h, currently +{profit_loss_pct:.1f}% profit - holding"
+                            analysis["confidence"] = min(analysis["confidence"], 0.7)
+                        elif price_change_pct > 0 and profit_loss_pct <= 0:
+                            hold_reason = f"predicted +{price_change_pct:.1f}% but currently {profit_loss_pct:.1f}% loss - selling to cut losses"
+                        else:
+                            hold_reason = f"price predicted {price_change_pct:.1f}% in {self.prediction_horizon_hours}h - selling to avoid further losses"
                     else:
-                        hold_reason = f"price predicted {price_change_pct:.1f}% in {self.prediction_horizon_hours}h - selling to avoid further losses"
+                        if price_change_pct > 0:
+                            signal = "hold_to_avoid_losses"
+                            hold_reason = f"price predicted +{price_change_pct:.1f}% in {self.prediction_horizon_hours}h (purchased {hours_since_purchase:.1f}h ago)"
+                            analysis["confidence"] = min(analysis["confidence"], 0.7)
+                        else:
+                            hold_reason = f"price predicted {price_change_pct:.1f}% in {self.prediction_horizon_hours}h - selling to avoid further losses"
                 
                 analysis = {**analysis, "signal": signal, "hold_reason": hold_reason}
 

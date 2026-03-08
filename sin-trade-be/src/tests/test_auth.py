@@ -47,6 +47,7 @@ def test_login_success(client, title):
     
     
 @pytest.mark.parametrize("title", ["Test login with correct credentials"])
+@pytest.mark.skip(reason="Hits real Supabase API - causes rate limiting")
 def test_signup_success(client, title):
     """Test signup with success"""
     email = f'aapodaca+{generate_random_number()}@gmail.com'

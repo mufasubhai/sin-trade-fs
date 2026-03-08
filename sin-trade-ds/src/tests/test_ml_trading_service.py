@@ -1,6 +1,7 @@
 import pytest
 import numpy as np
 from unittest.mock import MagicMock, patch
+from datetime import datetime, timezone, timedelta
 
 
 class TestMLTradingService:
@@ -446,3 +447,338 @@ class TestMLTradingServiceDefaults:
         assert service.default_frequency == 0.25
         assert service.min_price_movement_pct == 2.0
         assert service.min_peak_distance == 12
+        assert service.hold_after_purchase_hours == 24
+        assert service.prediction_horizon_hours == 16
+
+
+class TestMLTradingServiceLastPurchased:
+    @patch('src.services.ml_trading_service.DSConfig.supabase')
+    def test_get_last_purchased_exists(self, mock_supabase):
+        from src.services.ml_trading_service import MLTradingService
+        from datetime import datetime, timezone
+        
+        mock_response = MagicMock()
+        mock_response.data = [{"last_purchased": "2024-01-15T10:00:00Z"}]
+        
+        mock_table = MagicMock()
+        mock_supabase.table.return_value = mock_table
+        mock_table.select.return_value.eq.return_value.execute.return_value = mock_response
+        
+        service = MLTradingService()
+        result = service.get_last_purchased(1)
+        
+        assert result is not None
+        assert isinstance(result, datetime)
+
+    @patch('src.services.ml_trading_service.DSConfig.supabase')
+    def test_get_last_purchased_none(self, mock_supabase):
+        from src.services.ml_trading_service import MLTradingService
+        
+        mock_response = MagicMock()
+        mock_response.data = [{}]
+        
+        mock_table = MagicMock()
+        mock_supabase.table.return_value = mock_table
+        mock_table.select.return_value.eq.return_value.execute.return_value = mock_response
+        
+        service = MLTradingService()
+        result = service.get_last_purchased(1)
+        
+        assert result is None
+
+    @patch('src.services.ml_trading_service.DSConfig.supabase')
+    def test_get_last_purchased_no_data(self, mock_supabase):
+        from src.services.ml_trading_service import MLTradingService
+        
+        mock_response = MagicMock()
+        mock_response.data = []
+        
+        mock_table = MagicMock()
+        mock_supabase.table.return_value = mock_table
+        mock_table.select.return_value.eq.return_value.execute.return_value = mock_response
+        
+        service = MLTradingService()
+        result = service.get_last_purchased(1)
+        
+        assert result is None
+
+    @patch('src.services.ml_trading_service.DSConfig.supabase')
+    def test_get_last_purchased_no_db(self, mock_supabase):
+        from src.services.ml_trading_service import MLTradingService
+        
+        service = MLTradingService()
+        with patch('src.services.ml_trading_service.DSConfig') as mock_config:
+            mock_config.supabase = None
+            result = service.get_last_purchased(1)
+        
+        assert result is None
+
+
+class TestMLTradingServicePriceAtTime:
+    @patch('src.services.ml_trading_service.DSConfig.supabase')
+    def test_get_price_at_time_exists(self, mock_supabase):
+        from src.services.ml_trading_service import MLTradingService
+        from datetime import datetime, timezone, timedelta
+        
+        target_time = datetime(2024, 1, 15, 10, 0, 0, tzinfo=timezone.utc)
+        
+        mock_response = MagicMock()
+        mock_response.data = [{"current_price": "50000.0"}]
+        
+        mock_table = MagicMock()
+        mock_supabase.table.return_value = mock_table
+        mock_table.select.return_value.eq.return_value.gte.return_value.lte.return_value.order.return_value.limit.return_value.execute.return_value = mock_response
+        
+        service = MLTradingService()
+        result = service.get_price_at_time("BTC", target_time)
+        
+        assert result == 50000.0
+
+    @patch('src.services.ml_trading_service.DSConfig.supabase')
+    def test_get_price_at_time_no_data(self, mock_supabase):
+        from src.services.ml_trading_service import MLTradingService
+        from datetime import datetime, timezone
+        
+        target_time = datetime(2024, 1, 15, 10, 0, 0, tzinfo=timezone.utc)
+        
+        mock_response = MagicMock()
+        mock_response.data = []
+        
+        mock_table = MagicMock()
+        mock_supabase.table.return_value = mock_table
+        mock_table.select.return_value.eq.return_value.gte.return_value.lte.return_value.order.return_value.limit.return_value.execute.return_value = mock_response
+        
+        service = MLTradingService()
+        result = service.get_price_at_time("BTC", target_time)
+        
+        assert result is None
+
+
+class TestMLTradingServicePredictPrice:
+    @patch('src.services.ml_trading_service.MLTradingService.fetch_asset_price_history')
+    def test_predict_price_at_future_success(self, mock_fetch):
+        from src.services.ml_trading_service import MLTradingService
+        from datetime import datetime, timezone
+        
+        now = datetime.now(timezone.utc)
+        mock_fetch.return_value = [
+            {"current_price": str(100 + i), "price_time": (now - timedelta(hours=i)).isoformat()}
+            for i in range(24, 0, -1)
+        ]
+        
+        service = MLTradingService()
+        result = service.predict_price_at_future("BTC", hours_ahead=16)
+        
+        assert result is not None
+        assert isinstance(result, float)
+        assert result > 0
+
+    @patch('src.services.ml_trading_service.MLTradingService.fetch_asset_price_history')
+    def test_predict_price_at_future_insufficient_data(self, mock_fetch):
+        from src.services.ml_trading_service import MLTradingService
+        
+        mock_fetch.return_value = []
+        
+        service = MLTradingService()
+        result = service.predict_price_at_future("BTC", hours_ahead=16)
+        
+        assert result is None
+
+
+class TestMLTradingServiceGenerateNewSignalsWithLastPurchased:
+    @patch('src.services.ml_trading_service.MLTradingService.get_price_at_time')
+    @patch('src.services.ml_trading_service.MLTradingService.predict_price_at_future')
+    @patch('src.services.ml_trading_service.MLTradingService.get_last_purchased')
+    @patch('src.services.ml_trading_service.MLTradingService.analyze_price_action')
+    @patch('src.services.ml_trading_service.MLTradingService.get_ticker_success_rate')
+    @patch('src.services.ml_trading_service.MLTradingService.extract_features')
+    @patch('src.services.ml_trading_service.DSConfig.supabase')
+    def test_generate_new_signals_sell_with_recent_purchase_predict_up_in_profit(
+        self, mock_db, mock_features, mock_success, mock_analyze, mock_last_purchased, mock_predict, mock_price_at_time
+    ):
+        from src.services.ml_trading_service import MLTradingService
+        from datetime import datetime, timezone, timedelta
+        
+        now = datetime.now(timezone.utc)
+        last_purchased = now - timedelta(hours=12)
+        
+        mock_last_purchased.return_value = last_purchased
+        mock_predict.return_value = 110.0
+        mock_price_at_time.return_value = 100.0
+        
+        mock_analyze.return_value = {
+            "has_sufficient_data": True,
+            "signal": "sell",
+            "confidence": 0.8,
+            "current_price": 105.0,
+            "amplitude": 10.0,
+            "frequency": 0.25,
+            "phase": 0.0,
+            "offset": 100.0,
+            "trend_strength": 0.5,
+            "price_range": 10.0,
+            "peaks_count": 2,
+            "valleys_count": 2,
+            "data_points": 50,
+        }
+        mock_success.return_value = (0.5, 0)
+        mock_features.return_value = {}
+        
+        mock_table = MagicMock()
+        mock_db.table.return_value = mock_table
+        mock_table.select.return_value.eq.return_value.execute.return_value = MagicMock(data=[
+            {"user_id": 1, "asset_id": 1}
+        ])
+        
+        service = MLTradingService()
+        result = service.generate_new_signals([{"id": 1, "ticker_code": "BTC", "is_crypto": True}])
+        
+        assert len(result) == 1
+        assert result[0]["signal_type"] == "hold_to_avoid_losses"
+        assert "profit" in result[0]["hold_reason"].lower()
+
+    @patch('src.services.ml_trading_service.MLTradingService.get_price_at_time')
+    @patch('src.services.ml_trading_service.MLTradingService.predict_price_at_future')
+    @patch('src.services.ml_trading_service.MLTradingService.get_last_purchased')
+    @patch('src.services.ml_trading_service.MLTradingService.analyze_price_action')
+    @patch('src.services.ml_trading_service.MLTradingService.get_ticker_success_rate')
+    @patch('src.services.ml_trading_service.MLTradingService.extract_features')
+    @patch('src.services.ml_trading_service.DSConfig.supabase')
+    def test_generate_new_signals_sell_with_recent_purchase_predict_up_in_loss(
+        self, mock_db, mock_features, mock_success, mock_analyze, mock_last_purchased, mock_predict, mock_price_at_time
+    ):
+        from src.services.ml_trading_service import MLTradingService
+        from datetime import datetime, timezone, timedelta
+        
+        now = datetime.now(timezone.utc)
+        last_purchased = now - timedelta(hours=12)
+        
+        mock_last_purchased.return_value = last_purchased
+        mock_predict.return_value = 110.0
+        mock_price_at_time.return_value = 120.0
+        
+        mock_analyze.return_value = {
+            "has_sufficient_data": True,
+            "signal": "sell",
+            "confidence": 0.8,
+            "current_price": 105.0,
+            "amplitude": 10.0,
+            "frequency": 0.25,
+            "phase": 0.0,
+            "offset": 100.0,
+            "trend_strength": 0.5,
+            "price_range": 10.0,
+            "peaks_count": 2,
+            "valleys_count": 2,
+            "data_points": 50,
+        }
+        mock_success.return_value = (0.5, 0)
+        mock_features.return_value = {}
+        
+        mock_table = MagicMock()
+        mock_db.table.return_value = mock_table
+        mock_table.select.return_value.eq.return_value.execute.return_value = MagicMock(data=[
+            {"user_id": 1, "asset_id": 1}
+        ])
+        
+        service = MLTradingService()
+        result = service.generate_new_signals([{"id": 1, "ticker_code": "BTC", "is_crypto": True}])
+        
+        assert len(result) == 1
+        assert result[0]["signal_type"] == "sell"
+        assert "loss" in result[0]["hold_reason"].lower()
+
+    @patch('src.services.ml_trading_service.MLTradingService.get_price_at_time')
+    @patch('src.services.ml_trading_service.MLTradingService.predict_price_at_future')
+    @patch('src.services.ml_trading_service.MLTradingService.get_last_purchased')
+    @patch('src.services.ml_trading_service.MLTradingService.analyze_price_action')
+    @patch('src.services.ml_trading_service.MLTradingService.get_ticker_success_rate')
+    @patch('src.services.ml_trading_service.MLTradingService.extract_features')
+    @patch('src.services.ml_trading_service.DSConfig.supabase')
+    def test_generate_new_signals_sell_with_recent_purchase_predict_down(
+        self, mock_db, mock_features, mock_success, mock_analyze, mock_last_purchased, mock_predict, mock_price_at_time
+    ):
+        from src.services.ml_trading_service import MLTradingService
+        from datetime import datetime, timezone, timedelta
+        
+        now = datetime.now(timezone.utc)
+        last_purchased = now - timedelta(hours=12)
+        
+        mock_last_purchased.return_value = last_purchased
+        mock_predict.return_value = 95.0
+        mock_price_at_time.return_value = 100.0
+        
+        mock_analyze.return_value = {
+            "has_sufficient_data": True,
+            "signal": "sell",
+            "confidence": 0.8,
+            "current_price": 105.0,
+            "amplitude": 10.0,
+            "frequency": 0.25,
+            "phase": 0.0,
+            "offset": 100.0,
+            "trend_strength": 0.5,
+            "price_range": 10.0,
+            "peaks_count": 2,
+            "valleys_count": 2,
+            "data_points": 50,
+        }
+        mock_success.return_value = (0.5, 0)
+        mock_features.return_value = {}
+        
+        mock_table = MagicMock()
+        mock_db.table.return_value = mock_table
+        mock_table.select.return_value.eq.return_value.execute.return_value = MagicMock(data=[
+            {"user_id": 1, "asset_id": 1}
+        ])
+        
+        service = MLTradingService()
+        result = service.generate_new_signals([{"id": 1, "ticker_code": "BTC", "is_crypto": True}])
+        
+        assert len(result) == 1
+        assert result[0]["signal_type"] == "sell"
+        assert "avoid further losses" in result[0]["hold_reason"]
+
+    @patch('src.services.ml_trading_service.MLTradingService.get_last_purchased')
+    @patch('src.services.ml_trading_service.MLTradingService.analyze_price_action')
+    @patch('src.services.ml_trading_service.MLTradingService.get_ticker_success_rate')
+    @patch('src.services.ml_trading_service.MLTradingService.extract_features')
+    @patch('src.services.ml_trading_service.DSConfig.supabase')
+    def test_generate_new_signals_no_recent_purchase_sell_unaffected(
+        self, mock_db, mock_features, mock_success, mock_analyze, mock_last_purchased
+    ):
+        from src.services.ml_trading_service import MLTradingService
+        from datetime import datetime, timezone, timedelta
+        
+        mock_last_purchased.return_value = None
+        
+        mock_analyze.return_value = {
+            "has_sufficient_data": True,
+            "signal": "sell",
+            "confidence": 0.8,
+            "current_price": 105.0,
+            "amplitude": 10.0,
+            "frequency": 0.25,
+            "phase": 0.0,
+            "offset": 100.0,
+            "trend_strength": 0.5,
+            "price_range": 10.0,
+            "peaks_count": 2,
+            "valleys_count": 2,
+            "data_points": 50,
+        }
+        mock_success.return_value = (0.5, 0)
+        mock_features.return_value = {}
+        
+        mock_table = MagicMock()
+        mock_db.table.return_value = mock_table
+        mock_table.select.return_value.eq.return_value.execute.return_value = MagicMock(data=[
+            {"user_id": 1, "asset_id": 1}
+        ])
+        
+        service = MLTradingService()
+        result = service.generate_new_signals([{"id": 1, "ticker_code": "BTC", "is_crypto": True}])
+        
+        assert len(result) == 1
+        assert result[0]["signal_type"] == "sell"
+        assert result[0].get("hold_reason") is None
