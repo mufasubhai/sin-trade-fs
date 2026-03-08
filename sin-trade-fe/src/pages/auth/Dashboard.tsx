@@ -357,7 +357,12 @@ export default function Dashboard() {
                       <div className="flex items-center gap-1">
                         <input
                           type="datetime-local"
-                          value={asset.lastPurchased ? new Date(asset.lastPurchased).toISOString().slice(0, 16) : ""}
+                          value={asset.lastPurchased ? (() => {
+                            const date = new Date(asset.lastPurchased!);
+                            const offset = date.getTimezoneOffset() * 60000;
+                            const localDate = new Date(date.getTime() - offset);
+                            return localDate.toISOString().slice(0, 16);
+                          })() : ""}
                           onChange={(e) => {
                             if (user?.accessToken) {
                               void updateLastPurchased(
