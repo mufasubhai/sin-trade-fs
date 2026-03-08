@@ -18,6 +18,8 @@ class MLTradingService:
         self.default_frequency = 0.25
         self.min_price_movement_pct = 2.0
         self.min_peak_distance = 12
+        self.hold_after_purchase_hours = 24
+        self.prediction_horizon_hours = 16
 
     def fetch_asset_price_history(
         self, ticker_code: str, hours: int = 24
@@ -276,6 +278,62 @@ class MLTradingService:
             print(f"Error getting ticker stats: {e}")
             return 0.5, 0
 
+    def get_last_purchased(self, asset_id: int) -> Optional[datetime]:
+        try:
+            if not DSConfig.supabase:
+                return None
+            
+            response = (
+                DSConfig.supabase.table("user_assets")
+                .select("last_purchased")
+                .eq("asset_id", asset_id)
+                .execute()
+            )
+            
+            if response.data and response.data[0].get("last_purchased"):
+                last_purchased_str = response.data[0]["last_purchased"]
+                return datetime.fromisoformat(last_purchased_str.replace("Z", "+00:00"))
+            
+            return None
+        except Exception as e:
+            print(f"Error getting last purchased: {e}")
+            return None
+
+    def predict_price_at_future(
+        self, ticker_code: str, hours_ahead: float = 16
+    ) -> Optional[float]:
+        try:
+            history = self.fetch_asset_price_history(ticker_code, hours=24)
+            if not history or len(history) < self.min_data_points:
+                return None
+
+            prices = np.array([float(h["current_price"]) for h in history])
+            now = datetime.now(timezone.utc)
+            times = np.array(
+                [
+                    (datetime.fromisoformat(h["price_time"].replace("Z", "+00:00")) - now).total_seconds()
+                    / 3600
+                    for h in history
+                ]
+            )
+
+            amplitude, frequency, phase, offset = self.fit_sine_wave(prices, times)
+            
+            if not all([amplitude, frequency, phase, offset]):
+                return None
+
+            times_normalized = (times - times.min()) / (times.max() - times.min() + 1e-10)
+            
+            future_time_normalized = (hours_ahead - times.min()) / (times.max() - times.min() + 1e-10)
+            
+            predicted_price = sine_wave(future_time_normalized, amplitude, frequency, phase, offset)
+            
+            return float(predicted_price) if predicted_price > 0 else None
+            
+        except Exception as e:
+            print(f"Error predicting future price: {e}")
+            return None
+
     def evaluate_past_signals(self) -> int:
         try:
             if not DSConfig.supabase:
@@ -383,6 +441,16 @@ class MLTradingService:
             ticker_code = asset["ticker_code"]
             is_crypto = asset.get("is_crypto", False)
             
+            last_purchased = self.get_last_purchased(asset_id)
+            now = datetime.now(timezone.utc)
+            is_recently_purchased = False
+            hold_reason = None
+            
+            if last_purchased:
+                hours_since_purchase = (now - last_purchased).total_seconds() / 3600
+                if hours_since_purchase < self.hold_after_purchase_hours:
+                    is_recently_purchased = True
+            
             success_rate, total_signals = self.get_ticker_success_rate(ticker_code)
             
             min_confidence_threshold = 0.6
@@ -400,7 +468,31 @@ class MLTradingService:
             if not analysis["has_sufficient_data"]:
                 continue
 
-            if analysis["signal"] == "hold":
+            signal = analysis["signal"]
+            
+            if is_recently_purchased and signal == "sell":
+                current_price = analysis.get("current_price")
+                predicted_price = self.predict_price_at_future(
+                    ticker_code, hours_ahead=self.prediction_horizon_hours
+                )
+                
+                hours_since_purchase = 0
+                if last_purchased:
+                    hours_since_purchase = (now - last_purchased).total_seconds() / 3600
+                
+                if predicted_price and current_price and current_price > 0:
+                    price_change_pct = ((predicted_price - current_price) / current_price) * 100
+                    
+                    if price_change_pct > 0:
+                        signal = "hold_to_avoid_losses"
+                        hold_reason = f"price predicted +{price_change_pct:.1f}% in {self.prediction_horizon_hours}h (purchased {hours_since_purchase:.1f}h ago)"
+                        analysis["confidence"] = min(analysis["confidence"], 0.7)
+                    else:
+                        hold_reason = f"price predicted {price_change_pct:.1f}% in {self.prediction_horizon_hours}h - selling to avoid further losses"
+                
+                analysis = {**analysis, "signal": signal, "hold_reason": hold_reason}
+
+            if signal == "hold":
                 pass
             elif analysis["confidence"] < min_confidence_threshold:
                 continue
@@ -438,7 +530,7 @@ class MLTradingService:
                             "user_id": user_int_id,
                             "ticker_code": ticker_code,
                             "is_crypto": is_crypto,
-                            "signal_type": analysis["signal"],
+                            "signal_type": signal,
                             "price_at_signal": analysis["current_price"],
                             "confidence_score": adjusted_confidence,
                             "sine_wave_amplitude": analysis["amplitude"],
@@ -455,6 +547,7 @@ class MLTradingService:
                                 "data_points": analysis["data_points"],
                                 "historical_success_rate": success_rate,
                                 "total_historical_signals": total_signals,
+                                "hold_reason": hold_reason,
                             },
                         })
                         .execute()
@@ -467,9 +560,10 @@ class MLTradingService:
                             "ticker_code": ticker_code,
                             "is_crypto": is_crypto,
                             "user_id": user_int_id,
-                            "signal_type": analysis["signal"],
+                            "signal_type": signal,
                             "confidence": adjusted_confidence,
                             "features": features,
+                            "hold_reason": hold_reason,
                         })
 
             except Exception as e:

@@ -108,6 +108,12 @@ export default function AssetChart({ entry, onDaysChange, tickerCode }: AssetCha
   const step = Math.max(1, Math.floor(entry.data.length / 200));
   const chartData = entry.data.filter((_, i) => i % step === 0);
 
+  const prices = chartData.map((d) => d.currentPrice);
+  const minPrice = Math.min(...prices);
+  const maxPrice = Math.max(...prices);
+  const pricePadding = (maxPrice - minPrice) * 0.1;
+  const yDomain = [minPrice - pricePadding, maxPrice + pricePadding];
+
   return (
     <div className="flex flex-col gap-1">
       <div className="flex items-center gap-2">
@@ -142,7 +148,7 @@ export default function AssetChart({ entry, onDaysChange, tickerCode }: AssetCha
             interval="preserveStartEnd"
           />
             <YAxis
-              domain={["auto", "auto"]}
+              domain={yDomain}
               tick={{ fontSize: 10, fill: "#9ca3af" }}
               tickLine={false}
               axisLine={false}

@@ -163,3 +163,37 @@ class AssetService:
 
         except Exception as e:
             return {"message": str(e)}, 500
+
+    @staticmethod
+    def updateLastPurchased(data):
+        try:
+            if not BackendConfig.supabase:
+                return {"message": "Database connection unsuccessful"}, 500
+
+            asset_id = data.get("asset_id")
+            user_id = data.get("user_id")
+            last_purchased = data.get("last_purchased")
+
+            if not asset_id or not user_id:
+                return {"message": "asset_id and user_id are required"}, 400
+
+            update_data = {}
+            if last_purchased is not None:
+                update_data["last_purchased"] = last_purchased
+            else:
+                update_data["last_purchased"] = None
+
+            response = (
+                BackendConfig.supabase.table("user_assets")
+                .update(update_data)
+                .eq("asset_id", asset_id)
+                .eq("user_id", user_id)
+                .execute()
+            )
+
+            if response.data:
+                return {"message": "Last purchased date updated successfully", "data": response.data[0], "status": 200}, 200
+            return {"message": "Asset not found"}, 404
+
+        except Exception as e:
+            return {"message": str(e)}, 500

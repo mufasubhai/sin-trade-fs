@@ -31,6 +31,7 @@ import {
   UserCircleIcon,
   // UsersIcon,
   XMarkIcon,
+  ArrowPathIcon,
 } from "@heroicons/react/24/outline";
 import {
   ChevronDownIcon,
@@ -67,6 +68,7 @@ export default function Dashboard() {
     fetchAssetHistory,
     logoutUser,
     deleteAssetFromDB,
+    updateLastPurchased,
   }: AuthContextType = useAuth();
 
   useEffect(() => {
@@ -349,6 +351,42 @@ export default function Dashboard() {
                         tickerCode={asset.tickerName}
                         onDaysChange={(ticker: string, days: number) => { void fetchAssetHistory(ticker, days); }}
                       />
+                    </div>
+                    <div className="flex flex-col items-end gap-1 shrink-0">
+                      <label className="text-xs text-gray-500">Last Purchased</label>
+                      <div className="flex items-center gap-1">
+                        <input
+                          type="datetime-local"
+                          value={asset.lastPurchased ? new Date(asset.lastPurchased).toISOString().slice(0, 16) : ""}
+                          onChange={(e) => {
+                            if (user?.accessToken) {
+                              void updateLastPurchased(
+                                asset.assetId,
+                                user.userId,
+                                e.target.value ? new Date(e.target.value).toISOString() : null,
+                                user.accessToken
+                              );
+                            }
+                          }}
+                          className="text-sm border border-gray-300 rounded px-2 py-1"
+                        />
+                        <button
+                          onClick={() => {
+                            if (user?.accessToken) {
+                              void updateLastPurchased(
+                                asset.assetId,
+                                user.userId,
+                                null,
+                                user.accessToken
+                              );
+                            }
+                          }}
+                          className="p-1 text-gray-500 hover:text-red-500"
+                          title="Clear date"
+                        >
+                          <ArrowPathIcon className="size-4" />
+                        </button>
+                      </div>
                     </div>
                     <button
                       onClick={() => {

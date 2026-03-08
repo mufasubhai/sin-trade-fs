@@ -69,3 +69,16 @@ def single_asset(asset_id, user_id):
     else:
         return jsonify({'error': 'Invalid method'}), 405
 
+
+@asset_controller.route('/update_last_purchased', methods=['POST'])
+@require_auth
+def update_last_purchased():
+    try:
+        data = request.get_json()
+        response_data, status_code = AssetService.updateLastPurchased(data)
+        return response_data, status_code
+    except HTTPException as e:
+        return jsonify({'error': str(e.description)}), e.code
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+

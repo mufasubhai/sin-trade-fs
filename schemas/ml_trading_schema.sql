@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS ml_trade_signals (
     user_id BIGINT NOT NULL REFERENCES profiles(user_id) ON DELETE CASCADE,
     ticker_code VARCHAR(20) NOT NULL,
     is_crypto BOOLEAN NOT NULL DEFAULT FALSE,
-    signal_type VARCHAR(10) NOT NULL CHECK (signal_type IN ('buy', 'sell', 'hold')),
+    signal_type VARCHAR(20) NOT NULL CHECK (signal_type IN ('buy', 'sell', 'hold', 'hold_to_avoid_losses')),
     price_at_signal DECIMAL(20, 8),
     confidence_score DECIMAL(5, 4),
     sine_wave_amplitude DECIMAL(20, 8),

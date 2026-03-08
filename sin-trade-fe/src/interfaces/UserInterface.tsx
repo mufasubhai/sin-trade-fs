@@ -22,6 +22,7 @@ export interface Asset {
   id: number | null;
   tickerName: string;
   userId: number;
+  lastPurchased: Date | null;
 }
 
 export const AssetSchema = z
@@ -31,6 +32,7 @@ export const AssetSchema = z
     id: z.number().nullable(),
     ticker_name: z.string(),
     user_id: z.number(),
+    last_purchased: z.string().nullable().optional(),
   })
   .transform((data) => {
     return {
@@ -39,6 +41,7 @@ export const AssetSchema = z
       id: data.id ? data.id : null,
       tickerName: data.ticker_name,
       userId: data.user_id,
+      lastPurchased: data.last_purchased ? new Date(data.last_purchased) : null,
     };
   });
 

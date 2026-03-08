@@ -30,6 +30,12 @@ export interface AuthContextType {
     // refreshToken: string,
     accessToken: string
   ) => Promise<Response | undefined>;
+  updateLastPurchased: (
+    assetId: number,
+    userId: number,
+    lastPurchased: string | null,
+    accessToken: string
+  ) => Promise<Response | undefined>;
   setAssets: (assets: Record<string, Asset>) => void; // Repla
   //ce 'any' with your user type
   loginUser: (userData: UserResponse) => void;
@@ -188,6 +194,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const updateLastPurchased = async (
+    assetId: number,
+    userId: number,
+    lastPurchased: string | null,
+    accessToken: string
+  ) => {
+    try {
+      const response = await fetch(`${dataUrl}assets/update_last_purchased`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        method: "POST",
+        body: JSON.stringify({
+          asset_id: assetId,
+          user_id: userId,
+          last_purchased: lastPurchased,
+        }),
+      });
+      if (response.ok && response.status === 200) {
+        await fetchAssets();
+      }
+      return response;
+    } catch (error) {
+      console.error("Error updating last purchased", error);
+    }
+  };
+
   // this likely isn't a good enouhg check, btu it's a start. We need verification with supabase
 
   const loginUser = (userData: UserResponse) => {
@@ -221,6 +255,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       value={{
         accessToken,
         addAssetToDB,
+        updateLastPurchased,
         assets,
         assetHistory,
         deleteAssetFromDB,
