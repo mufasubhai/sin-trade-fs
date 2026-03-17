@@ -20,6 +20,12 @@ class MLTradingService:
         self.min_peak_distance = 12
         self.hold_after_purchase_hours = 24
         self.prediction_horizon_hours = 16
+        self.model_weights = {"sine_wave": 0.4, "moving_averages": 0.3, "rsi": 0.2, "trend": 0.1}
+        self.rsi_period = 14
+        self.rsi_overbought = 70
+        self.rsi_oversold = 30
+        self.short_ma_period = 5
+        self.long_ma_period = 20
 
     def fetch_asset_price_history(
         self, ticker_code: str, hours: int = 24
@@ -618,6 +624,191 @@ class MLTradingService:
                 continue
 
         return new_signals
+
+    def _calculate_rsi(self, prices: np.ndarray) -> float:
+        if len(prices) < self.rsi_period + 1:
+            return 50.0
+
+        deltas = np.diff(prices)
+        gains = np.where(deltas > 0, deltas, 0)
+        losses = np.where(deltas < 0, -deltas, 0)
+
+        avg_gain = np.mean(gains[-self.rsi_period:])
+        avg_loss = np.mean(losses[-self.rsi_period:])
+
+        if avg_loss == 0:
+            return 100.0
+
+        rs = avg_gain / avg_loss
+        rsi = 100 - (100 / (1 + rs))
+
+        return float(np.clip(rsi, 0, 100))
+
+    def _calculate_macd(self, prices: np.ndarray) -> Tuple[float, float]:
+        if len(prices) < 26:
+            return 0.0, 0.0
+
+        ema_short = np.mean(prices[-12:])
+        ema_long = np.mean(prices[-26:])
+        macd = ema_short - ema_long
+
+        signal_line = np.mean(prices[-9:])
+
+        return float(macd), float(signal_line)
+
+    def _calculate_bollinger_bands(self, prices: np.ndarray) -> Tuple[float, float, float]:
+        if len(prices) < 20:
+            middle = np.mean(prices)
+            return float(middle), float(middle), float(middle)
+
+        middle = np.mean(prices[-20:])
+        std = np.std(prices[-20:])
+        upper = middle + (std * 2)
+        lower = middle - (std * 2)
+
+        return float(upper), float(lower), float(middle)
+
+    def _analyze_sine_wave_model(
+        self,
+        amplitude: Optional[float],
+        frequency: Optional[float],
+        phase: Optional[float],
+        offset: Optional[float],
+        current_price: float,
+        prices: np.ndarray,
+        normalized_position: float,
+    ) -> Tuple[str, float, float]:
+        if not all([amplitude, frequency, phase, offset]):
+            return "hold", 0.3, 0.0
+
+        predicted_peak = offset + amplitude
+        predicted_valley = offset - amplitude
+        time_to_peak = (np.pi / 2 - phase) / (2 * np.pi * frequency) if frequency > 0 else 999
+        time_to_valley = (-np.pi / 2 - phase) / (2 * np.pi * frequency) if frequency > 0 else 999
+
+        sell_movement_pct = ((predicted_peak - current_price) / current_price) * 100 if current_price > 0 else 0
+        buy_movement_pct = ((current_price - predicted_valley) / current_price) * 100 if current_price > 0 else 0
+
+        if normalized_position > 0.85 and time_to_peak < 1 and sell_movement_pct >= self.min_price_movement_pct:
+            return "sell", min(0.95, normalized_position + 0.1), sell_movement_pct
+        elif normalized_position < 0.15 and time_to_valley < 1 and buy_movement_pct >= self.min_price_movement_pct:
+            return "buy", min(0.95, (1 - normalized_position) + 0.1), buy_movement_pct
+        else:
+            return "hold", 0.3, 0.0
+
+    def _analyze_moving_averages_model(self, prices: np.ndarray, times: np.ndarray) -> Tuple[str, float, float]:
+        if len(prices) < self.min_data_points:
+            return "hold", 0.2, 0.0
+
+        short_ma = np.mean(prices[-self.short_ma_period:])
+        long_ma = np.mean(prices[-self.long_ma_period:])
+
+        current_price = prices[0]
+
+        if short_ma > long_ma and current_price > short_ma:
+            movement_pct = ((current_price - long_ma) / long_ma) * 100
+            return "buy", 0.6, max(2.0, movement_pct)
+        elif short_ma < long_ma and current_price < short_ma:
+            movement_pct = ((short_ma - current_price) / current_price) * 100
+            return "sell", 0.6, max(2.0, movement_pct)
+        else:
+            return "hold", 0.3, 0.0
+
+    def _analyze_rsi_model(self, prices: np.ndarray) -> Tuple[str, float, float]:
+        if len(prices) < self.rsi_period + 1:
+            return "hold", 0.2, 0.0
+
+        rsi = self._calculate_rsi(prices)
+
+        if rsi < self.rsi_oversold:
+            movement_pct = (self.rsi_oversold - rsi) / rsi * 5 if rsi > 0 else 0
+            return "buy", min(0.8, (self.rsi_oversold - rsi) / 30), max(1.0, movement_pct)
+        elif rsi > self.rsi_overbought:
+            movement_pct = (rsi - self.rsi_overbought) / (100 - rsi) * 5 if rsi < 100 else 0
+            return "sell", min(0.8, (rsi - self.rsi_overbought) / 30), max(1.0, movement_pct)
+        else:
+            return "hold", 0.3, 0.0
+
+    def _analyze_trend_model(self, trend_strength: float) -> Tuple[str, float, float]:
+        if trend_strength > 0.5:
+            return "buy", min(0.8, 0.5 + trend_strength * 0.5), trend_strength * 3
+        elif trend_strength < -0.5:
+            return "sell", min(0.8, 0.5 + abs(trend_strength) * 0.5), abs(trend_strength) * 3
+        else:
+            return "hold", 0.3, 0.0
+
+    def _combine_model_signals(
+        self, signals: Dict[str, Tuple[str, float, float]], current_price: float, normalized_position: float
+    ) -> Tuple[str, float, float]:
+        if not signals:
+            return "hold", 0.0, 0.0
+
+        signal_counts = {"buy": 0, "sell": 0, "hold": 0}
+        weighted_confidence = 0.0
+        total_weight = 0.0
+        expected_movement = 0.0
+
+        for model_name, (signal, confidence, movement) in signals.items():
+            if signal != "hold":
+                signal_counts[signal] += 1
+                weight = self.model_weights.get(model_name, 0.25)
+                weighted_confidence += confidence * weight
+                total_weight += weight
+                expected_movement += movement * weight
+
+        if total_weight > 0:
+            weighted_confidence /= total_weight
+        else:
+            weighted_confidence = 0.3
+
+        if signal_counts["buy"] > signal_counts["sell"]:
+            final_signal = "buy"
+        elif signal_counts["sell"] > signal_counts["buy"]:
+            final_signal = "sell"
+        else:
+            final_signal = "hold"
+
+        if final_signal == "hold":
+            weighted_confidence = 0.3
+
+        return final_signal, weighted_confidence, expected_movement
+
+    def _adjust_model_weights(self, signal_history: List[Dict]) -> None:
+        if not signal_history:
+            return
+
+        model_performance = {
+            "sine_wave": 0,
+            "moving_averages": 0,
+            "rsi": 0,
+            "trend": 0,
+        }
+
+        for record in signal_history:
+            if record.get("was_correct"):
+                features = record.get("features", {})
+                if features.get("amplitude"):
+                    model_performance["sine_wave"] += 1
+                if features.get("macd"):
+                    model_performance["moving_averages"] += 1
+                if features.get("rsi"):
+                    model_performance["rsi"] += 1
+                if features.get("trend_strength"):
+                    model_performance["trend"] += 1
+
+        total_correct = sum(model_performance.values())
+        if total_correct == 0:
+            return
+
+        total_weight = sum(self.model_weights.values())
+        for model_name in self.model_weights:
+            correct_count = model_performance.get(model_name, 0)
+            self.model_weights[model_name] = (correct_count / total_correct) * total_weight
+
+        weights_sum = sum(self.model_weights.values())
+        if weights_sum > 0:
+            for model_name in self.model_weights:
+                self.model_weights[model_name] /= weights_sum
 
     def get_users_with_signals(self) -> List[Dict]:
         try:
