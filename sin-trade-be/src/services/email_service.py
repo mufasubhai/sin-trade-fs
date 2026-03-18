@@ -140,6 +140,17 @@ class EmailService:
             color = "#22c55e" if signal_type == "BUY" else "#ef4444" if signal_type == "SELL" else "#6b7280"
             asset_type = "Crypto" if is_crypto else "Stock"
             
+            # Format price: at least 2 decimal places (cents), up to 5 decimals for sub-dollar prices
+            if price < 1:
+                price_str = f"${price:.5f}".rstrip('0')
+                # Ensure at least 2 decimal places
+                if '.' not in price_str:
+                    price_str += '.00'
+                elif len(price_str.split('.')[1]) < 2:
+                    price_str += '0' * (2 - len(price_str.split('.')[1]))
+            else:
+                price_str = f"${price:.2f}"
+            
             signal_rows += f"""
             <tr>
                 <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">
@@ -147,7 +158,7 @@ class EmailService:
                 </td>
                 <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">{ticker_code}</td>
                 <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">{asset_type}</td>
-                <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">${price:.2f}</td>
+                <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">{price_str}</td>
                 <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">{confidence*100:.1f}%</td>
             </tr>
             """
