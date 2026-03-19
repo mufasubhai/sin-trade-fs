@@ -151,6 +151,16 @@ class EmailService:
             else:
                 price_str = f"${price:.2f}"
             
+            # Format last purchased date
+            last_purchased_str = "N/A"
+            last_purchased = signal.get("last_purchased")
+            if last_purchased:
+                try:
+                    dt = datetime.fromisoformat(last_purchased.replace("Z", "+00:00"))
+                    last_purchased_str = dt.strftime("%Y-%m-%d %I:%M %p")
+                except:
+                    last_purchased_str = last_purchased
+            
             signal_rows += f"""
             <tr>
                 <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">
@@ -160,6 +170,7 @@ class EmailService:
                 <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">{asset_type}</td>
                 <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">{price_str}</td>
                 <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">{confidence*100:.1f}%</td>
+                <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">{last_purchased_str}</td>
             </tr>
             """
 
@@ -201,6 +212,7 @@ class EmailService:
                                 <th style="padding: 12px; text-align: left; border-bottom: 1px solid #e5e7eb;">Asset</th>
                                 <th style="padding: 12px; text-align: left; border-bottom: 1px solid #e5e7eb;">Price</th>
                                 <th style="padding: 12px; text-align: left; border-bottom: 1px solid #e5e7eb;">Confidence</th>
+                                <th style="padding: 12px; text-align: left; border-bottom: 1px solid #e5e7eb;">Last Purchased</th>
                             </tr>
                         </thead>
                         <tbody>

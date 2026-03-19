@@ -827,7 +827,10 @@ class MLTradingService:
                     signal_type,
                     price_at_signal,
                     confidence_score,
-                    created_at
+                    created_at,
+                    asset_id!inner (
+                        last_purchased
+                    )
                     """
                 )
                 .eq("is_active", True)
@@ -855,6 +858,11 @@ class MLTradingService:
                 
                 existing = users_map[user_id]["signals"].get(asset_id)
                 if existing is None or (signal.get("created_at", "") > existing.get("created_at", "")):
+                    last_purchased = None
+                    asset_data = signal.get("asset_id", {})
+                    if asset_data and isinstance(asset_data, dict):
+                        last_purchased = asset_data.get("last_purchased")
+                    
                     users_map[user_id]["signals"][asset_id] = {
                         "asset_id": asset_id,
                         "ticker_code": ticker_code or "UNKNOWN",
@@ -863,6 +871,7 @@ class MLTradingService:
                         "price_at_signal": signal["price_at_signal"],
                         "confidence_score": signal["confidence_score"],
                         "created_at": signal.get("created_at", ""),
+                        "last_purchased": last_purchased,
                     }
 
             for user_id in users_map:
