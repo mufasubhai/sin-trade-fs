@@ -3,6 +3,7 @@ import numpy as np
 from scipy.optimize import curve_fit
 from datetime import datetime, timedelta, timezone
 from typing import List, Dict, Tuple, Optional
+import logging
 from src.config import DSConfig
 
 
@@ -827,10 +828,7 @@ class MLTradingService:
                     signal_type,
                     price_at_signal,
                     confidence_score,
-                    created_at,
-                    asset_id!inner (
-                        last_purchased
-                    )
+                    created_at
                     """
                 )
                 .eq("is_active", True)
@@ -858,10 +856,7 @@ class MLTradingService:
                 
                 existing = users_map[user_id]["signals"].get(asset_id)
                 if existing is None or (signal.get("created_at", "") > existing.get("created_at", "")):
-                    last_purchased = None
-                    asset_data = signal.get("asset_id", {})
-                    if asset_data and isinstance(asset_data, dict):
-                        last_purchased = asset_data.get("last_purchased")
+                    last_purchased = self.get_last_purchased(asset_id)
                     
                     users_map[user_id]["signals"][asset_id] = {
                         "asset_id": asset_id,
