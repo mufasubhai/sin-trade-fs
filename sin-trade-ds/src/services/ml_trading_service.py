@@ -856,7 +856,8 @@ class MLTradingService:
                 
                 existing = users_map[user_id]["signals"].get(asset_id)
                 if existing is None or (signal.get("created_at", "") > existing.get("created_at", "")):
-                    last_purchased = self.get_last_purchased(asset_id)
+                    last_purchased_dt = self.get_last_purchased(asset_id)
+                    last_purchased_str = last_purchased_dt.isoformat() if last_purchased_dt else None
                     
                     users_map[user_id]["signals"][asset_id] = {
                         "asset_id": asset_id,
@@ -866,7 +867,7 @@ class MLTradingService:
                         "price_at_signal": signal["price_at_signal"],
                         "confidence_score": signal["confidence_score"],
                         "created_at": signal.get("created_at", ""),
-                        "last_purchased": last_purchased,
+                        "last_purchased": last_purchased_str,
                     }
 
             for user_id in users_map:
