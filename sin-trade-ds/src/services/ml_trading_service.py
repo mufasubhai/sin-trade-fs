@@ -14,10 +14,10 @@ def sine_wave(x, amplitude, frequency, phase, offset):
 class MLTradingService:
     def __init__(self):
         self.lookback_hours = 4
-        self.target_hours = 4
+        self.target_hours = 8
         self.min_data_points = 20
         self.default_frequency = 0.25
-        self.min_price_movement_pct = 2.0
+        self.min_price_movement_pct = 3.5
         self.min_peak_distance = 12
         self.hold_after_purchase_hours = 24
         self.prediction_horizon_hours = 16
@@ -872,6 +872,7 @@ class MLTradingService:
 
             for user_id in users_map:
                 users_map[user_id]["signals"] = list(users_map[user_id]["signals"].values())
+                users_map[user_id]["signals"].sort(key=lambda s: s["ticker_code"])
 
             for user_id in users_map:
                 try:
@@ -953,6 +954,15 @@ async def run_ml_trading_analysis():
     if not assets:
         print("No active assets found")
         return
+
+    print("Adjusting model weights based on historical performance...")
+    try:
+        history_response = DSConfig.supabase.table("ml_signal_history").select("was_correct, features").execute()
+        signal_history = history_response.data if history_response.data else []
+        service._adjust_model_weights(signal_history)
+        print(f"Adjusted weights: {service.model_weights}")
+    except Exception as e:
+        print(f"Error adjusting model weights: {e}")
 
     print(f"Analyzing {len(assets)} assets...")
     new_signals = service.generate_new_signals(assets)

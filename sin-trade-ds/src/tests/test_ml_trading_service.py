@@ -442,10 +442,10 @@ class TestMLTradingServiceDefaults:
         service = MLTradingService()
         
         assert service.lookback_hours == 4
-        assert service.target_hours == 4
+        assert service.target_hours == 8
         assert service.min_data_points == 20
         assert service.default_frequency == 0.25
-        assert service.min_price_movement_pct == 2.0
+        assert service.min_price_movement_pct == 3.5
         assert service.min_peak_distance == 12
         assert service.hold_after_purchase_hours == 24
         assert service.prediction_horizon_hours == 16
