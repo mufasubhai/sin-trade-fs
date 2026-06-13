@@ -449,15 +449,20 @@ class TestMLTradingServiceDefaults:
         assert service.min_peak_distance == 12
         assert service.hold_after_purchase_hours == 24
         assert service.prediction_horizon_hours == 16
-        assert service.model_weights["sine_wave"] == 0.4
-        assert service.model_weights["moving_averages"] == 0.3
-        assert service.model_weights["rsi"] == 0.2
-        assert service.model_weights["trend"] == 0.1
+        assert service.model_weights["sine_wave"] == 0.2
+        assert service.model_weights["moving_averages"] == 0.15
+        assert service.model_weights["momentum"] == 0.3
+        assert service.model_weights["rsi"] == 0.15
+        assert service.model_weights["trend"] == 0.2
         assert service.rsi_period == 14
         assert service.rsi_overbought == 70
         assert service.rsi_oversold == 30
         assert service.short_ma_period == 5
         assert service.long_ma_period == 20
+        assert service.ema_fast_period == 9
+        assert service.ema_slow_period == 21
+        assert service.ema_signal_period == 55
+        assert service.min_volatility_threshold == 0.005
 
 
 class TestMLTradingServiceEnsembleModels:

@@ -26,12 +26,12 @@ cd sin-trade-fe
 pnpm install
 
 # Backend virtual environments (important for VSCode launch.json)
-python -m venv sin-trade-be/be-venv
+python3 -m venv sin-trade-be/be-venv
 source sin-trade-be/be-venv/bin/activate
 pip install -r sin-trade-be/requirements.txt
 deactivate
 
-python -m venv sin-trade-ds/ds-venv
+python3 -m venv sin-trade-ds/ds-venv
 source sin-trade-ds/ds-venv/bin/activate
 pip install -r sin-trade-ds/requirements.txt
 deactivate

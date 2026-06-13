@@ -23,7 +23,7 @@ services:
       - SUPABASE_URL=${SUPABASE_URL:-https://fake_key.supabase.co}
       - SUPABASE_KEY=${SUPABASE_KEY:-your-supabase-key}
       - CLOUDAMQP_URL=${CLOUDAMQP_URL:-your-cloudamqp-url}
-      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:5173}
+      - CORS_ORIGINS=${CORS_ORIGINS:-*}
 
   ds:
     build:
@@ -39,7 +39,7 @@ services:
       - ALPHAVANTAGE_KEY=${ALPHAVANTAGE_KEY:-your-alphavantage-key}
       - POLYGON_KEY=${POLYGON_KEY:-your-polygon-key}
       - CLOUDAMQP_URL=${CLOUDAMQP_URL:-your-cloudamqp-url}
-      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:5173}
+      - CORS_ORIGINS=${CORS_ORIGINS:-*}
 
 #   prometheus:
 #     build:

@@ -326,20 +326,18 @@ export default function Dashboard() {
               confirmDisabled={false}
             />
             <div className="px-4 py-10 sm:px-6 lg:px-8 lg:py-6">
-              {Object.values(assets ?? {}).map((asset) => {
-                if (
-                  searchString &&
-                  !asset.tickerName
-                    .toLowerCase()
-                    .includes(searchString.toLowerCase())
-                ) {
-                  return null;
-                }
-                // need to add some additional styling to the asset. This should end up being a column thathas the ticker name, last updated, and a button to remove the asset.
-                // we also need to add an updated value to the object in the DB.
-                return (
-                  <div
-                    key={asset.assetId}
+              {[...Object.values(assets ?? {})]
+                .filter((asset) => {
+                  if (searchString) {
+                    return asset.tickerName.toLowerCase().includes(searchString.toLowerCase());
+                  }
+                  return true;
+                })
+                .sort((a, b) => a.tickerName.localeCompare(b.tickerName))
+                .map((asset) => {
+                  return (
+                    <div
+                      key={asset.assetId}
                     className="flex flex-row items-center gap-4 w-full border-b border-gray-100 py-3"
                   >
                     <span className="w-16 shrink-0 text-sm font-semibold text-gray-900">
@@ -358,7 +356,7 @@ export default function Dashboard() {
                         <input
                           type="datetime-local"
                           value={asset.lastPurchased ? (() => {
-                            const date = new Date(asset.lastPurchased!);
+                            const date = new Date(asset.lastPurchased);
                             const offset = date.getTimezoneOffset() * 60000;
                             const localDate = new Date(date.getTime() - offset);
                             return localDate.toISOString().slice(0, 16);

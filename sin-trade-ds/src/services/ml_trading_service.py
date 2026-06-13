@@ -1,4 +1,5 @@
 
+import json
 import numpy as np
 from scipy.optimize import curve_fit
 from datetime import datetime, timedelta, timezone
@@ -21,12 +22,59 @@ class MLTradingService:
         self.min_peak_distance = 12
         self.hold_after_purchase_hours = 24
         self.prediction_horizon_hours = 16
-        self.model_weights = {"sine_wave": 0.4, "moving_averages": 0.3, "rsi": 0.2, "trend": 0.1}
+        self.model_weights = {"sine_wave": 0.2, "moving_averages": 0.15, "momentum": 0.3, "rsi": 0.15, "trend": 0.2}
         self.rsi_period = 14
         self.rsi_overbought = 70
         self.rsi_oversold = 30
         self.short_ma_period = 5
         self.long_ma_period = 20
+        self.ema_fast_period = 9
+        self.ema_slow_period = 21
+        self.ema_signal_period = 55
+        self.min_volatility_threshold = 0.005
+
+    def _calculate_volatility(self, prices: np.ndarray) -> float:
+        if len(prices) < 2:
+            return 0.0
+        return float(np.std(prices) / np.mean(prices))
+
+    def _calculate_ema(self, prices: np.ndarray, period: int) -> float:
+        if len(prices) < period:
+            return float(np.mean(prices))
+        multiplier = 2.0 / (period + 1)
+        ordered = prices[::-1]
+        ema = float(np.mean(ordered[:period]))
+        for i in range(period, len(ordered)):
+            ema = (ordered[i] - ema) * multiplier + ema
+        return ema
+
+    def _classify_regime(self, prices: np.ndarray, volatility: float, trend_strength: float) -> str:
+        if len(prices) < 20:
+            return "insufficient_data"
+        if volatility > 0.02:
+            return "high_volatility"
+        if abs(trend_strength) > 0.6:
+            return "trending"
+        return "ranging"
+
+    def _analyze_momentum_model(self, prices: np.ndarray) -> Tuple[str, float, float]:
+        if len(prices) < self.ema_slow_period:
+            return "hold", 0.2, 0.0
+
+        ema_fast = self._calculate_ema(prices, self.ema_fast_period)
+        ema_slow = self._calculate_ema(prices, self.ema_slow_period)
+        ema_signal = self._calculate_ema(prices, self.ema_signal_period)
+        current_price = prices[0]
+
+        if ema_fast > ema_slow and ema_fast > ema_signal and current_price > ema_fast:
+            return "buy", 0.65, 3.0
+        if ema_fast < ema_slow and ema_fast < ema_signal and current_price < ema_fast:
+            return "sell", 0.65, 3.0
+        if ema_fast > ema_slow and current_price > ema_fast:
+            return "buy", 0.5, 2.0
+        if ema_fast < ema_slow and current_price < ema_fast:
+            return "sell", 0.5, 2.0
+        return "hold", 0.3, 0.0
 
     def fetch_asset_price_history(
         self, ticker_code: str, hours: int = 24
@@ -151,6 +199,19 @@ class MLTradingService:
             }
 
         prices = np.array([float(h["current_price"]) for h in history])
+
+        volatility = self._calculate_volatility(prices)
+        if volatility < self.min_volatility_threshold:
+            return {
+                "asset_id": asset_id,
+                "ticker_code": ticker_code,
+                "has_sufficient_data": True,
+                "signal": "hold",
+                "confidence": 0.0,
+                "volatility": volatility,
+                "reason": "low_volatility_noise_gate"
+            }
+
         now = datetime.now(timezone.utc)
         times = np.array(
             [
@@ -167,38 +228,22 @@ class MLTradingService:
         current_price = prices[0]
         normalized_position = (current_price - prices.min()) / (prices.max() - prices.min() + 1e-10)
 
-        signal = "hold"
-        confidence = 0.5
-        expected_movement_pct = 0.0
+        regime = self._classify_regime(prices, volatility, trend_strength)
 
-        if amplitude and frequency and phase and offset:
-            predicted_peak = offset + amplitude
-            predicted_valley = offset - amplitude
-            time_to_peak = (np.pi / 2 - phase) / (2 * np.pi * frequency) if frequency > 0 else 999
-            time_to_valley = (-np.pi / 2 - phase) / (2 * np.pi * frequency) if frequency > 0 else 999
+        signals = {
+            "sine_wave": self._analyze_sine_wave_model(amplitude, frequency, phase, offset, current_price, prices, normalized_position),
+            "moving_averages": self._analyze_moving_averages_model(prices, times),
+            "momentum": self._analyze_momentum_model(prices),
+            "rsi": self._analyze_rsi_model(prices),
+            "trend": self._analyze_trend_model(trend_strength),
+        }
 
-            sell_movement_pct = ((predicted_peak - current_price) / current_price) * 100 if current_price > 0 else 0
-            buy_movement_pct = ((current_price - predicted_valley) / current_price) * 100 if current_price > 0 else 0
+        signal, confidence, expected_movement_pct = self._combine_model_signals(signals, current_price, normalized_position)
 
-            if normalized_position > 0.85 and time_to_peak < 1 and sell_movement_pct >= self.min_price_movement_pct:
-                signal = "sell"
-                expected_movement_pct = sell_movement_pct
-                confidence = min(0.95, normalized_position + 0.1)
-            elif normalized_position < 0.15 and time_to_valley < 1 and buy_movement_pct >= self.min_price_movement_pct:
-                signal = "buy"
-                expected_movement_pct = buy_movement_pct
-                confidence = min(0.95, (1 - normalized_position) + 0.1)
-            elif trend_strength > 0.7:
-                signal = "buy"
-                confidence = min(0.9, 0.5 + trend_strength * 0.4)
-                expected_movement_pct = trend_strength * 5
-            elif trend_strength < -0.7:
-                signal = "sell"
-                confidence = min(0.9, 0.5 + abs(trend_strength) * 0.4)
-                expected_movement_pct = abs(trend_strength) * 5
-            elif abs(trend_strength) > 0.4:
-                signal = "hold"
-                confidence = min(0.8, 0.5 + abs(trend_strength) * 0.3)
+        if regime == "high_volatility":
+            confidence = min(confidence, 0.65)
+
+        model_votes = {name: s[0] for name, s in signals.items()}
 
         return {
             "asset_id": asset_id,
@@ -209,6 +254,8 @@ class MLTradingService:
             "current_price": current_price,
             "price_range": float(prices.max() - prices.min()),
             "trend_strength": float(trend_strength),
+            "volatility": volatility,
+            "regime": regime,
             "amplitude": float(amplitude) if amplitude else None,
             "frequency": float(frequency) if frequency else None,
             "phase": float(phase) if phase else None,
@@ -219,6 +266,7 @@ class MLTradingService:
             "prices": prices.tolist(),
             "times": times.tolist(),
             "expected_movement_pct": expected_movement_pct,
+            "model_votes": model_votes,
         }
 
     def extract_features(self, ticker_code: str, analysis: Dict) -> Dict:
@@ -428,18 +476,43 @@ class MLTradingService:
                     continue
 
                 price_at_signal = float(signal["price_at_signal"])
-                
+                metadata = signal.get("metadata", {})
+                if isinstance(metadata, str):
+                    try:
+                        metadata = json.loads(metadata)
+                    except (json.JSONDecodeError, TypeError):
+                        metadata = {}
+
+                expected_movement_pct = metadata.get("expected_movement_pct", 0.0)
+                if not isinstance(expected_movement_pct, (int, float)):
+                    expected_movement_pct = 0.0
+
+                actual_movement_pct = 0.0
+                if price_at_signal > 0:
+                    actual_movement_pct = ((price_4h_later - price_at_signal) / price_at_signal) * 100
+
                 was_correct = None
+                magnitude_score = None
                 profit_loss_percent = None
 
                 if signal["signal_type"] == "sell":
-                    was_correct = price_4h_later < price_at_signal
-                    if price_at_signal > 0:
-                        profit_loss_percent = ((price_at_signal - price_4h_later) / price_at_signal) * 100
+                    was_correct = actual_movement_pct < 0
+                    profit_loss_percent = -actual_movement_pct if price_at_signal > 0 else None
                 elif signal["signal_type"] == "buy":
-                    was_correct = price_4h_later > price_at_signal
-                    if price_at_signal > 0:
-                        profit_loss_percent = ((price_4h_later - price_at_signal) / price_at_signal) * 100
+                    was_correct = actual_movement_pct > 0
+                    profit_loss_percent = actual_movement_pct if price_at_signal > 0 else None
+
+                if was_correct is not None and expected_movement_pct != 0:
+                    expected_abs = abs(expected_movement_pct)
+                    if was_correct:
+                        actual_abs = abs(actual_movement_pct)
+                        shortfall = max(0.0, expected_abs - actual_abs) / expected_abs
+                        magnitude_score = max(0.0, 1.0 - min(1.0, shortfall))
+                    else:
+                        magnitude_score = 0.0
+                    weighted_score = 0.3 * (1.0 if was_correct else 0.0) + 0.7 * magnitude_score
+                else:
+                    weighted_score = 1.0 if was_correct else 0.0 if was_correct is not None else None
 
                 DSConfig.supabase.table("ml_signal_history").insert({
                     "signal_id": signal["id"],
@@ -453,7 +526,13 @@ class MLTradingService:
                     "was_correct": was_correct,
                     "profit_loss_percent": profit_loss_percent,
                     "evaluation_timestamp": signal["created_at"],
-                    "features": signal.get("metadata", {}),
+                    "features": {
+                        **metadata,
+                        "magnitude_score": magnitude_score,
+                        "weighted_score": weighted_score,
+                        "expected_movement_pct": expected_movement_pct,
+                        "actual_movement_pct": actual_movement_pct,
+                    },
                 }).execute()
 
                 DSConfig.supabase.table("ml_trade_signals").update({
@@ -602,6 +681,8 @@ class MLTradingService:
                                 "historical_success_rate": success_rate,
                                 "total_historical_signals": total_signals,
                                 "hold_reason": hold_reason,
+                                "expected_movement_pct": analysis.get("expected_movement_pct", 0.0),
+                                "model_votes": analysis.get("model_votes", {}),
                             },
                         })
                         .execute()
@@ -781,29 +862,35 @@ class MLTradingService:
         model_performance = {
             "sine_wave": 0,
             "moving_averages": 0,
+            "momentum": 0,
             "rsi": 0,
             "trend": 0,
         }
 
         for record in signal_history:
-            if record.get("was_correct"):
-                features = record.get("features", {})
-                if features.get("amplitude"):
-                    model_performance["sine_wave"] += 1
-                if features.get("macd"):
-                    model_performance["moving_averages"] += 1
-                if features.get("rsi"):
-                    model_performance["rsi"] += 1
-                if features.get("trend_strength"):
-                    model_performance["trend"] += 1
+            features = record.get("features", {})
+            if isinstance(features, str):
+                try:
+                    features = json.loads(features)
+                except (json.JSONDecodeError, TypeError):
+                    features = {}
 
-        total_correct = sum(model_performance.values())
+            model_votes = features.get("model_votes", {})
+            if model_votes and isinstance(model_votes, dict):
+                for model_name, vote in model_votes.items():
+                    if vote in ("buy", "sell") and model_name in model_performance:
+                        if record.get("was_correct") is True:
+                            model_performance[model_name] += 1
+                        else:
+                            model_performance[model_name] -= 0.5
+
+        total_correct = sum(max(0, v) for v in model_performance.values())
         if total_correct == 0:
             return
 
         total_weight = sum(self.model_weights.values())
         for model_name in self.model_weights:
-            correct_count = model_performance.get(model_name, 0)
+            correct_count = max(0, model_performance.get(model_name, 0))
             self.model_weights[model_name] = (correct_count / total_correct) * total_weight
 
         weights_sum = sum(self.model_weights.values())

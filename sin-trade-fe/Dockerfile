@@ -1,5 +1,5 @@
 # Use the official Node.js image from the Docker Hub
-FROM node:22.1.0
+FROM node:22.13.0
 
 
 ARG VITE_BACKEND_URL
@@ -7,11 +7,13 @@ ENV VITE_BACKEND_URL=$VITE_BACKEND_URL
 
 RUN echo "VITE_BACKEND_URL is set to: ${VITE_BACKEND_URL}"
 
-# Set the working directory
+# Set the working directory in the container
 WORKDIR /app
 
-# Copy the package.json and pnpm-lock.yaml files
-COPY package.json pnpm-lock.yaml ./
+ENV CI=true
+
+# Copy the package.json, pnpm-lock.yaml and pnpm-workspace.yaml files
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
 # Install pnpm
 RUN npm install -g pnpm

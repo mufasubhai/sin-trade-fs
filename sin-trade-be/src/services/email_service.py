@@ -125,10 +125,13 @@ class EmailService:
         if not signals:
             return "<p>No signals available.</p>"
             
+        sorted_signals = sorted(
+            [s for s in signals if s], 
+            key=lambda x: x.get("ticker_code", "UNKNOWN").upper()
+        )
+
         signal_rows = ""
-        for i, signal in enumerate(signals, 1):
-            if not signal:
-                continue
+        for i, signal in enumerate(sorted_signals, 1)
             signal_type = (signal.get("signal_type") or "unknown").upper()
             if signal_type == "HOLD":
                 signal_type = "NEUTRAL"
