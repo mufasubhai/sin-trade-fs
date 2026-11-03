@@ -8,6 +8,7 @@
     "build": "tsc -b && vite build",
     "build-start": "tsc -b && vite build && vite preview --host",
     "lint": "eslint .",
+    "typecheck": "tsc -b",
     "serve": "vite preview --host",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage"

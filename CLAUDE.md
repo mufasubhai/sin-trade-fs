@@ -2,6 +2,8 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+@AGENTS.md
+
 ## Project Overview
 
 A full-stack trading application with microservices architecture:
@@ -53,7 +55,7 @@ cd sin-trade-ds
 pytest
 ```
 
-Frontend:x
+Frontend:
 ```bash
 cd sin-trade-fe
 pnpm test
